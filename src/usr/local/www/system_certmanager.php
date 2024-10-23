@@ -62,11 +62,7 @@ if (isset($_REQUEST['userid']) && is_numericint($_REQUEST['userid'])) {
 
 if (isset($userid)) {
 	$cert_methods["existing"] = gettext("Choose an existing certificate");
-	config_init_path('system/user');
 }
-
-config_init_path('ca');
-config_init_path('cert');
 
 $internal_ca_count = 0;
 foreach (config_get_path('cert', []) as $ca) {
@@ -757,7 +753,7 @@ if (in_array($act, array('new', 'edit')) || (($_POST['save'] == gettext("Save"))
 		'descr',
 		'*Descriptive name',
 		'text',
-		(config_get_path('system/user') && empty($pconfig['descr'])) ? config_get_path("system/user/{$userid}/name") : $pconfig['descr']
+		(isset($userid) && config_get_path('system/user') && empty($pconfig['descr'])) ? config_get_path("system/user/{$userid}/name") : $pconfig['descr']
 	))->addClass('toggle-internal toggle-import toggle-edit toggle-external toggle-sign toggle-existing collapse')
 	->setHelp('The name of this entry as displayed in the GUI for reference.%s' .
 		'This name can contain spaces but it cannot contain any of the ' .
@@ -1473,9 +1469,6 @@ foreach (config_get_path('cert', []) as $cert):
 						<?php endif?>
 						<?php if (is_kea_cert($cert['refid'])): ?>
 							<?=gettext("Kea")?><br/>
-						<?php endif?>
-						<?php if (is_ldap_client_cert($cert['refid'])): ?>
-							<?=gettext("LDAP Client")?><br/>
 						<?php endif?>
 						<?php if (is_openvpn_client_cert($cert['refid'])): ?>
 							<?=gettext("OpenVPN Client")?><br/>

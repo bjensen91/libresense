@@ -62,14 +62,12 @@ if (!$if) {
 	exit;
 }
 
-config_init_path("dhcpd/{$if}/staticmap");
-config_init_path("dhcpd/{$if}/pool");
 $static_arp_enabled = config_path_enabled("dhcpd/{$if}", 'staticarp');
 $ifcfgip = get_interface_ip($if);
 $ifcfgsn = get_interface_subnet($if);
 $ifcfgdescr = convert_friendly_interface_to_friendly_descr($if);
 
-$id = $_REQUEST['id'];
+$id = is_numericint($_REQUEST['id']) ? $_REQUEST['id'] : null;
 
 $this_map_config = isset($id) ? config_get_path("dhcpd/{$if}/staticmap/{$id}") : null;
 if ($this_map_config) {
@@ -266,10 +264,10 @@ if ($_POST['save']) {
 		$input_errors[] = gettext("A valid IPv4 address must be specified for the primary/secondary WINS servers.");
 	}
 
-	$parent_ip = get_interface_ip($_POST['if']);
+	$parent_ip = get_interface_ip($if);
 	if (is_ipaddrv4($parent_ip) && $_POST['gateway']) {
-		$parent_sn = get_interface_subnet($_POST['if']);
-		if (!ip_in_subnet($_POST['gateway'], gen_subnet($parent_ip, $parent_sn) . "/" . $parent_sn) && !ip_in_interface_alias_subnet($_POST['if'], $_POST['gateway'])) {
+		$parent_sn = get_interface_subnet($if);
+		if (!ip_in_subnet($_POST['gateway'], gen_subnet($parent_ip, $parent_sn) . "/" . $parent_sn) && !ip_in_interface_alias_subnet($if, $_POST['gateway'])) {
 			$input_errors[] = sprintf(gettext("The gateway address %s does not lie within the chosen interface's subnet."), $_POST['gateway']);
 		}
 	}
@@ -542,7 +540,7 @@ $section->add($group);
 $cid_help = gettext('An optional identifier to match based on the value sent by the client (RFC 2132).');
 if (dhcp_is_backend('kea')) {
 	$cid_help .= '<br /><br />';
-	$cid_help .= gettext('Kea DHCP will only match on MAC address if both MAC address and client identifier are set for a static reservation.');
+	$cid_help .= gettext('Kea DHCP will match on MAC address if both MAC address and client identifier are set for a static mapping.');
 }
 
 $section->addInput(new Form_Input(

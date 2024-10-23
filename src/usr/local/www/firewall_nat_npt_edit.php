@@ -36,8 +36,6 @@ require_once("filter.inc");
 require_once("shaper.inc");
 require_once("firewall_nat_npt.inc");
 
-config_init_path('nat/npt');
-
 if (isset($_REQUEST['id']) && is_numericint($_REQUEST['id'])) {
 	$id = $_REQUEST['id'];
 }
@@ -46,7 +44,7 @@ if (isset($_REQUEST['after'])) {
 	$after = $_REQUEST['after'];
 }
 
-if (isset($_REQUEST['dup'])) {
+if (isset($_REQUEST['dup']) && is_numericint($_REQUEST['dup'])) {
 	$id = $_REQUEST['dup'];
 	$after = $_REQUEST['dup'];
 }

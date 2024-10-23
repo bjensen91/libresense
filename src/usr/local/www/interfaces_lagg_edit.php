@@ -32,8 +32,6 @@ require_once("guiconfig.inc");
 
 global $lagghash_list;
 
-config_init_path('laggs/lagg');
-
 $portlist = get_interface_list();
 $laggprotos	  = array("none", "lacp", "failover", "loadbalance", "roundrobin");
 $laggprotosuc = array(gettext("NONE"), gettext("LACP"), gettext("FAILOVER"), gettext("LOADBALANCE"), gettext("ROUNDROBIN"));
@@ -100,7 +98,7 @@ $realifchecklist = array();
 /* add LAGG interfaces */
 foreach (config_get_path('laggs/lagg', []) as $lagg) {
 	unset($portlist[$lagg['laggif']]);
-	$laggiflist = explode(",", $lagg['members']);
+	$laggiflist = array_filter(explode(",", $lagg['members']));
 	foreach ($laggiflist as $tmpif) {
 		$realifchecklist[get_real_interface($tmpif)] = $tmpif;
 	}
@@ -112,13 +110,13 @@ foreach ($checklist as $tmpif) {
 	$realifchecklist[get_real_interface($tmpif)] = $tmpif;
 }
 
-$id = $_REQUEST['id'];
+$id = is_numericint($_REQUEST['id']) ? $_REQUEST['id'] : null;
 
 $this_lagg_config = isset($id) ? config_get_path("laggs/lagg/{$id}") : null;
 if ($this_lagg_config) {
 	$pconfig['laggif'] = $this_lagg_config['laggif'];
 	$pconfig['members'] = $this_lagg_config['members'];
-	$laggiflist = explode(",", $this_lagg_config['members']);
+	$laggiflist = array_filter(explode(",", $this_lagg_config['members']));
 	foreach ($laggiflist as $tmpif) {
 		unset($realifchecklist[get_real_interface($tmpif)]);
 	}

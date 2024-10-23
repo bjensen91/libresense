@@ -49,7 +49,6 @@ if (dhcp_is_backend('isc')) {
 	exit;
 }
 
-config_init_path('kea');
 $pconfig = config_get_path('kea', []);
 
 $iflist = get_configured_interface_with_descr();
@@ -105,7 +104,7 @@ $have_small_subnet = false;
 $tab_array[] = [gettext('Settings'), true, 'services_dhcp_settings.php'];
 
 foreach ($iflist as $ifent => $ifname) {
-	$oc = config_get_path("interfaces/{$ifent}");
+	$oc = config_get_path("interfaces/{$ifent}", []);
 
 	/* Not static IPv4 or subnet >= 31 */
 	if ($oc['subnet'] >= 31) {
@@ -245,7 +244,7 @@ $section->addInput(new Form_Input(
 	array_get_path($pconfig, 'ha/heartbeatdelay'),
 	['placeholder' => kea_defaults('heartbeatdelay')]
 ))->addClass('advopt')
-  ->setHelp(sprintf(gettext('Specifies a duration in milliseconds between sending the last heartbeat and the next heartbeat.%s' . 
+  ->setHelp(sprintf(gettext('Specifies a duration in milliseconds between sending the last heartbeat and the next heartbeat.%s' .
 			'The heartbeats are sent periodically to gather the status of the partner and to verify whether the partner is still operating.'), '<br/>'));
 
 $section->addInput(new Form_Input(
@@ -255,7 +254,7 @@ $section->addInput(new Form_Input(
 	array_get_path($pconfig, 'ha/maxresponsedelay'),
 	['placeholder' => kea_defaults('maxresponsedelay')]
 ))->addClass('advopt')
-  ->setHelp(sprintf(gettext('Specifies a duration in milliseconds since the last successful communication with the partner, after which the server assumes that communication with the partner is interrupted.%s' . 
+  ->setHelp(sprintf(gettext('Specifies a duration in milliseconds since the last successful communication with the partner, after which the server assumes that communication with the partner is interrupted.%s' .
 			'Notice: This duration should be greater than the heartbeat delay.'), '<br/>'));
 
 $section->addInput(new Form_Input(
@@ -367,7 +366,7 @@ events.push(function() {
 	function update_tls_section() {
 		var tlsshow = $('#ha_tls').prop('checked');
 		var mtlsshow = $('#ha_mutualtls').prop('checked');
-	
+
 		hideInput('ha_scertref', !tlsshow);
 		hideInput('ha_ccertref', !(tlsshow && mtlsshow));
 		hideCheckbox('ha_mutualtls', !tlsshow);

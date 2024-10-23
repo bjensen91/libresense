@@ -44,8 +44,6 @@ function vpn_pppoe_get_id() {
 	return $vpnid;
 }
 
-config_init_path('pppoes/pppoe');
-
 if (is_numericint($_REQUEST['id'])) {
 	$id = $_REQUEST['id'];
 }
@@ -588,7 +586,7 @@ if (isset($id)) {
 		'id',
 		null,
 		'hidden',
-		htmlspecialchars($id, ENT_QUOTES | ENT_HTML401)
+		$id
 	));
 }
 

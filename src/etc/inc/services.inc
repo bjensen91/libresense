@@ -39,8 +39,6 @@ function services_radvd_configure($blacklist = array()) {
 		echo "services_radvd_configure() being called $mt\n";
 	}
 
-	config_init_path('dhcpdv6');
-
 	$Iflist = get_configured_interface_list();
 	$Iflist = array_merge($Iflist, get_configured_pppoe_server_interfaces());
 
@@ -373,6 +371,8 @@ function services_radvd_configure($blacklist = array()) {
 			log_error("configuring RA on {$if} for type {$autotype} radvd subnet {$subnetv6}/{$ifcfgsnv6}");
 		}
 
+		$dhcpv6ifconf = config_get_path("dhcpdv6/{$if}", []);
+
 		$radvdconf .= "# Generated config for {$autotype} delegation from {$trackif} on {$if}\n";
 		$radvdconf .= "interface {$realif} {\n";
 		$radvdconf .= "\tAdvSendAdvert on;\n";
@@ -401,7 +401,7 @@ function services_radvd_configure($blacklist = array()) {
 		$radvdconf .= "\t};\n";
 
 		/* add DNS servers */
-		if ($dhcpv6ifconf['radvd-dns'] != 'disabled') {
+		if (isset($dhcpv6ifconf['radvd-dns']) && ($dhcpv6ifconf['radvd-dns'] != 'disabled')) {
 			$dnslist = array();
 			if (config_path_enabled('dnsmasq') || config_path_enabled('unbound')) {
 				$dnslist[] = $ifcfgipv6;
@@ -486,6 +486,8 @@ function services_kea6_configure() {
 	$kea_var_lib = '/var/lib/kea';
 	$kea_var_db = '/var/db/kea';
 
+	$kea6socket = g_get('varrun_path') . '/kea6-ctrl-socket';
+
 	if (g_get('services_dhcp_server_enable') == false) {
 		return;
 	}
@@ -518,8 +520,7 @@ function services_kea6_configure() {
 	}
 
 	$syscfg = config_get_path('system');
-	config_init_path('dhcpdv6');
-	$dhcpdv6cfg = config_get_path('dhcpdv6');
+	$dhcpdv6cfg = config_get_path('dhcpdv6', []);
 	$Iflist = get_configured_interface_list();
 	$Iflist = array_merge($Iflist, get_configured_pppoe_server_interfaces());
 
@@ -550,7 +551,7 @@ function services_kea6_configure() {
 		'hooks-libraries' => [],
 		'control-socket' => [
 			'socket-type' => 'unix',
-			'socket-name' => '/var/run/kea6-ctrl-socket'
+			'socket-name' => $kea6socket
 		],
 	];
 
@@ -1002,7 +1003,7 @@ kea6_skip_first_pool_options:
 	$known_duids = array_keys($known_duids);
 	foreach ($known_duids as $duid) {
 		$keaconf['Dhcp6']['reservations'][] = [
-			'duid' => $duid
+			'duid' => (string) $duid
 		];
 	}
 
@@ -1124,6 +1125,8 @@ function services_kea4_configure() {
 	$kea_var_run = g_get('varrun_path') . '/kea';
 	$kea_var_lib = '/var/lib/kea';
 
+	$kea4socket = g_get('varrun_path').'/kea4-ctrl-socket';
+
 	if (g_get('services_dhcp_server_enable') == false) {
 		return;
 	}
@@ -1154,8 +1157,7 @@ function services_kea4_configure() {
 	}
 
 	$syscfg = config_get_path('system');
-	config_init_path('dhcpd');
-	$dhcpdcfg = config_get_path('dhcpd');
+	$dhcpdcfg = config_get_path('dhcpd', []);
 	$Iflist = get_configured_interface_list();
 
 	/* configuration is built as a PHP array and converted to json */
@@ -1193,7 +1195,7 @@ function services_kea4_configure() {
 		'hooks-libraries' => [],
 		'control-socket' => [
 			'socket-type' => 'unix',
-			'socket-name' => '/var/run/kea4-ctrl-socket'
+			'socket-name' => $kea4socket
 		],
 	];
 
@@ -1344,8 +1346,10 @@ function services_kea4_configure() {
 	}
 
 	/* store known MACs and CIDs as we encounter them during the walk */
-	$known_macs = [];
-	$known_cids = [];
+	$reserve_macs = [];
+	$reserve_cids = [];
+
+	$mac_classes = [];
 
 	$keasubnet_id = 1; /* kea subnet id must start at 1 */
 	foreach ($dhcpdcfg as $dhcpif => $dhcpifconf) {
@@ -1440,19 +1444,9 @@ function services_kea4_configure() {
 		if (!empty($all_mac_strings)) {
 			$all_mac_list = array_unique(explode(',', implode(',', $all_mac_strings)));
 			foreach ($all_mac_list as $mac) {
-				if (empty($mac)) {
-					continue;
+				if ($mac) {
+					$mac_classes[$mac] = true;
 				}
-
-				/* create client classes (mac_0123456789ab) for MAC address matching */
-				$umacstr = strtoupper(str_replace(':', '', $mac));
-				$lmacstr = strtolower($umacstr);
-				$lmacstr_len = strlen($lmacstr);
-				$test_string = 'substring(hexstring(pkt4.mac, \'\'), 0, %s) == \'%s\'';
-				$keaconf['Dhcp4']['client-classes'][] = [
-					'name' => 'mac_'.$umacstr,
-					'test' => sprintf($test_string, $lmacstr_len, $lmacstr)
-				];
 			}
 		}
 
@@ -1932,7 +1926,7 @@ function services_kea4_configure() {
 					$keares['hw-address'] = $sm['mac'];
 
 					/* keys are unique */
-					$known_macs[$sm['mac']] = true;
+					$reserve_macs[$sm['mac']] = true;
 				}
 
 				$sm['cid'] = strtolower(trim($sm['cid']));
@@ -1948,7 +1942,7 @@ function services_kea4_configure() {
 					}
 
 					/* keys are unique */
-					$known_cids[$sm['cid']] = true;
+					$reserve_cids[$sm['cid']] = true;
 				}
 
 				if ($sm['ipaddr']) {
@@ -2200,17 +2194,28 @@ function services_kea4_configure() {
 		}
 	}
 
+	/* create client classes (mac_0123456789ab) for MAC address matching */
+	foreach (array_keys($mac_classes) as $mac) {
+		$umacstr = strtoupper(str_replace(':', '', $mac));
+		$lmacstr = strtolower($umacstr);
+		$lmacstr_len = strlen($lmacstr);
+		$test_string = 'substring(hexstring(pkt4.mac, \'\'), 0, %s) == \'%s\'';
+		/* mac client classes need to be defined early */
+		array_unshift($keaconf['Dhcp4']['client-classes'], [
+			'name' => 'mac_'.$umacstr,
+			'test' => sprintf($test_string, $lmacstr_len, $lmacstr)
+		]);
+	}
+
 	/* add global reservations for known macs */
-	$known_macs = array_keys($known_macs);
-	foreach ($known_macs as $mac) {
+	foreach (array_keys($reserve_macs) as $mac) {
 		$keaconf['Dhcp4']['reservations'][] = [
 			'hw-address' => $mac
 		];
 	}
 
 	/* add global reservations for known cids */
-	$known_cids = array_keys($known_cids);
-	foreach ($known_cids as $cid) {
+	foreach (array_keys($reserve_cids) as $cid) {
 		$keaconf['Dhcp4']['reservations'][] = [
 			'client-id' => $cid
 		];
@@ -2270,8 +2275,7 @@ function services_dhcpdv4_configure() {
 	}
 
 	$syscfg = config_get_path('system');
-	config_init_path('dhcpd');
-	$dhcpdcfg = config_get_path('dhcpd');
+	$dhcpdcfg = config_get_path('dhcpd', []);
 	$Iflist = get_configured_interface_list();
 
 	/* Only consider DNS servers with IPv4 addresses for the IPv4 DHCP server. */
@@ -3416,8 +3420,7 @@ function services_dhcpdv6_configure($blacklist = array()) {
 	}
 
 	$syscfg = config_get_path('system');
-	config_init_path('dhcpdv6');
-	$dhcpdv6cfg = config_get_path('dhcpdv6');
+	$dhcpdv6cfg = config_get_path('dhcpdv6', []);
 	$Iflist = get_configured_interface_list();
 	$Iflist = array_merge($Iflist, get_configured_pppoe_server_interfaces());
 
@@ -3905,8 +3908,7 @@ function services_dhcrelay_configure() {
 	/* kill any running dhcrelay */
 	killbypid("{$g['varrun_path']}/dhcrelay.pid");
 
-	config_init_path('dhcrelay');
-	$dhcrelaycfg = config_get_path('dhcrelay');
+	$dhcrelaycfg = config_get_path('dhcrelay', []);
 
 	/* DHCPRelay enabled on any interfaces? */
 	if (!isset($dhcrelaycfg['enable'])) {
@@ -3957,7 +3959,7 @@ function services_dhcrelay_configure() {
 	 * In order for the relay to work, it needs to be active
 	 * on the interface in which the destination server sits.
 	 */
-	$srvips = explode(",", $dhcrelaycfg['server']);
+	$srvips = array_filter(explode(",", $dhcrelaycfg['server']));
 	if (!is_array($srvips)) {
 		log_error(gettext("No destination IP has been configured!"));
 		return;
@@ -4026,8 +4028,7 @@ function services_dhcrelay6_configure() {
 	/* kill any running dhcrelay */
 	killbypid("{$g['varrun_path']}/dhcrelay6.pid");
 
-	config_init_path('dhcrelay6');
-	$dhcrelaycfg = config_get_path('dhcrelay6');
+	$dhcrelaycfg = config_get_path('dhcrelay6', []);
 
 	/* DHCPv6 Relay enabled on any interfaces? */
 	if (!isset($dhcrelaycfg['enable'])) {
@@ -4077,7 +4078,7 @@ function services_dhcrelay6_configure() {
 	 * In order for the relay to work, it needs to be active
 	 * on the interface in which the destination server sits.
 	 */
-	$srvips = explode(",", $dhcrelaycfg['server']);
+	$srvips = array_filter(explode(",", $dhcrelaycfg['server']));
 	$srvifaces = array();
 	foreach ($srvips as $srcidx => $srvip) {
 		$destif = guess_interface_from_ip($srvip);
@@ -4313,7 +4314,7 @@ function services_dnsmasq_configure($restart_dhcp = true) {
 
 		$listen_addresses = "";
 
-		$interfaces = explode(",", config_get_path('dnsmasq/interface', ""));
+		$interfaces = array_filter(explode(",", config_get_path('dnsmasq/interface', "")));
 		foreach ($interfaces as $interface) {
 			$if = get_real_interface($interface);
 			if (does_interface_exist($if)) {
@@ -4386,7 +4387,7 @@ function services_dnsmasq_configure($restart_dhcp = true) {
 		$args .= ' --no-resolv';
 		if (!config_path_enabled('dnsmasq', 'no_system_dns')) {
 			foreach (get_dns_nameservers(false, true) as $dns) {
-				if (($dns != '127.0.0.1') && ($dns != '::1')) {
+				if (is_ipaddr($dns) && !ip_in_subnet($dns, "127.0.0.0/8") && !ip_in_subnet($dns, "::1/128")) {
 					$args .= ' --server=' . $dns;
 				}
 			}
@@ -4729,7 +4730,7 @@ EOD;
 			if (strstr($ipproto, "6")) {
 				$inet6 = true;
 			}
-			foreach (explode(",", config_get_path('snmpd/bindip', "")) as $bind_to_ip) {
+			foreach (array_filter(explode(",", config_get_path('snmpd/bindip', ""))) as $bind_to_ip) {
 				if (is_ipaddr($bind_to_ip)) {
 					$bind_to_ips[] = $bind_to_ip;
 				} else {
@@ -5223,7 +5224,7 @@ function upnp_start() {
 	}
 
 	if (config_get_path('installedpackages/miniupnpd/config/0/enable') == 'on') {
-		echo gettext("Starting UPnP service... ");
+		echo gettext("Starting UPnP IGD & PCP service...");
 		require_once('/usr/local/pkg/miniupnpd.inc');
 		sync_package_miniupnpd();
 		echo "done.\n";
@@ -5234,8 +5235,6 @@ function install_cron_job($command, $active = false, $minute = "0", $hour = "*",
 	$is_installed = false;
 	$cron_changed = true;
 	$change_message = "";
-
-	config_init_path('cron/item');
 
 	$job = null;
 	foreach (config_get_path('cron/item', []) as $idx => $item) {

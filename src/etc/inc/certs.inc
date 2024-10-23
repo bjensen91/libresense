@@ -434,7 +434,6 @@ function cert_create(& $cert, $caref, $keylen, $lifetime, $dn, $type = "user", $
 
 	// If this is a self-signed cert, blank out the CA and sign with the cert's key
 	if ($type == "self-signed") {
-		config_del_path("ca/{$ca_item_config['idx']}");
 		$ca           = null;
 		$ca_res_crt   = null;
 		$ca_res_key   = $res_key;
@@ -2380,9 +2379,7 @@ function cert_notify_expiring() {
 	$notifications = array();
 
 	/* Check all CA and Cert entries at once */
-	config_init_path('ca');
-	config_init_path('cert');
-	$all_certs = array_merge_recursive(config_get_path('ca'), config_get_path('cert'));
+	$all_certs = array_merge_recursive(config_get_path('ca', []), config_get_path('cert', []));
 
 	foreach ($all_certs as $cert) {
 		if (empty($cert)) {

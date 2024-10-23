@@ -866,7 +866,7 @@ function service_control_stop($name, $extras) {
 				usleep(100000);
 			}
 			/* Make sure sshguard stops as well */
-			sigkillbyname("sshguard", "TERM");
+			system_sshguard_stop();
 			break;
 		default:
 			stop_service($name);
@@ -911,6 +911,8 @@ function service_control_restart($name, $extras) {
 		case 'unbound':
 			services_unbound_configure();
 			break;
+		case 'kea-dhcp4':
+		case 'kea-dhcp6':
 		case 'dhcpd':
 			services_dhcpd_configure();
 			break;

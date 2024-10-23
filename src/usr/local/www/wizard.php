@@ -173,8 +173,6 @@ function update_config_field($field, $updatetext, $unset, $arraynum, $field_type
 	}
 
 	// Verify that the needed config array element exists. If not, create it
-	config_init_path($field_conv);
-
 	config_set_path($field_conv, $updatetext);
 }
 
@@ -369,7 +367,7 @@ function fixup_string($string) {
 			$host_if = find_ip_interface($urlhost);
 			if ($host_if) {
 				$host_if = convert_real_interface_to_friendly_interface_name($host_if);
-				$host_if_ip = config_get_path("interfaces/{$host_if}/ipaddr");
+				$host_if_ip = (!empty($host_if)) ? config_get_path("interfaces/{$host_if}/ipaddr") : null;
 				if ($host_if && is_ipaddr($host_if_ip)) {
 					$urlhost = $host_if_ip;
 				}
@@ -643,8 +641,6 @@ if ($pkg['step'][$stepid]['fields']['field'] != "") {
 					$options[$field['add_to_certca_selection']] = $field['add_to_certca_selection'];
 				}
 
-				config_init_path('ca');
-
 				foreach (config_get_path('ca', []) as $ca) {
 					$caname = htmlspecialchars($ca['descr']);
 
@@ -693,8 +689,6 @@ if ($pkg['step'][$stepid]['fields']['field'] != "") {
 
 					$options[$field['add_to_cert_selection']] = $field['add_to_cert_selection'];
 				}
-
-				config_init_path('cert');
 
 				foreach (config_get_path('cert', []) as $ca) {
 					if (stristr($ca['descr'], "webconf")) {
@@ -871,6 +865,30 @@ if ($pkg['step'][$stepid]['fields']['field'] != "") {
 				  ->setAttribute('rows', $field['rows'])
 				  ->setOnchange(($field['validate']) ? "FieldValidate(this.value, \"" . $field['validate'] . "\", \"" . $field['message'] . "\")":"");
 
+				break;
+			case "textarea_source":
+				if ($field['displayname']) {
+					$etitle = $field['displayname'];
+				} else if (!$field['dontdisplayname']) {
+					$etitle =  fixup_string($field['name']);
+				}
+
+				$source = $field['source'];
+				try{
+					@eval("\$value = &$source;");
+				} catch (\Throwable | \Error | \Exception $e) {
+					log_error($e);
+				}
+				$input = $section->addInput(new Form_Textarea(
+					$name,
+					$etitle,
+					$value
+				))->setHelp($field['description'])
+				  ->setAttribute('rows', $field['rows'])
+				  ->setOnchange(($field['validate']) ? "FieldValidate(this.value, \"" . $field['validate'] . "\", \"" . $field['message'] . "\")":"");
+				if ($field['readonly']) {
+					$input->setReadonly();
+				}
 				break;
 			case "submit":
 				$form->addGlobal(new Form_Button(

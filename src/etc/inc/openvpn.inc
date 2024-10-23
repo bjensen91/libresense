@@ -404,8 +404,6 @@ function openvpn_create_dhparams($bits) {
 }
 
 function openvpn_vpnid_used($vpnid) {
-	config_init_path('openvpn/openvpn-server');
-	config_init_path('openvpn/openvpn-client');
 	foreach (["server", "client"] as $mode) {
 		foreach (config_get_path("openvpn/openvpn-{$mode}", []) as $settings) {
 			if ($vpnid == $settings['vpnid']) {
@@ -854,7 +852,7 @@ function openvpn_reconfigure($mode, $settings) {
 		mwexec("/sbin/ifconfig " . escapeshellarg($devname) . " group openvpn");
 
 		$ifname = convert_real_interface_to_friendly_interface_name($devname);
-		$grouptmp = link_interface_to_group($ifname);
+		$grouptmp = (!empty($ifname)) ? link_interface_to_group($ifname) : null;
 		if (!empty($grouptmp)) {
 			array_walk($grouptmp, 'interface_group_add_member');
 		}
@@ -864,7 +862,7 @@ function openvpn_reconfigure($mode, $settings) {
 	$pfile = g_get('varrun_path') . "/openvpn_{$mode_id}.pid";
 	$proto = strtolower($settings['protocol']);
 	if (substr($settings['protocol'], 0, 3) == "TCP") {
-			$proto = "{$proto}-{$mode}";
+		$proto = "{$proto}-{$mode}";
 	}
 	$dev_mode = $settings['dev_mode'];
 	$fbcipher = $settings['data_ciphers_fallback'];
@@ -1391,6 +1389,7 @@ function openvpn_reconfigure($mode, $settings) {
 	if ($settings['mode'] == "p2p_shared_key") {
 		$conf .= "cipher {$fbcipher}\n";
 	} else {
+		/* Build data ciphers list from configuration. */
 		$conf .= "data-ciphers " . str_replace(',', ':', openvpn_build_data_cipher_list($settings['data_ciphers'], $fbcipher)) . "\n";
 		$conf .= "data-ciphers-fallback {$fbcipher}\n";
 	}
@@ -1445,7 +1444,9 @@ function openvpn_reconfigure($mode, $settings) {
 	}
 
 	// If the server is not a TLS server or it has a tunnel network CIDR less than a /30, skip this.
-	if (in_array($settings['mode'], $openvpn_tls_server_modes) && (!empty($ip) && !empty($mask) && ($cidr < 30)) && $settings['dev_mode'] != "tap") {
+	if (in_array($settings['mode'], $openvpn_tls_server_modes) &&
+	    (!empty($ip) && !empty($mask) && ($cidr < 30)) &&
+	    ($settings['dev_mode'] != "tap")) {
 		if (empty($settings['topology'])) {
 			$settings['topology'] = "subnet";
 		}
@@ -1535,14 +1536,10 @@ function openvpn_reconfigure($mode, $settings) {
 	}
 }
 
-function openvpn_restart($mode, $settings) {
+function openvpn_stop_process($mode, $settings) {
 	global $g;
 
-	$vpnid = $settings['vpnid'];
 	$mode_id = openvpn_name($mode, $settings, 'generic');
-	$lockhandle = lock("openvpnservice{$mode_id}", LOCK_EX);
-	openvpn_reconfigure($mode, $settings);
-	/* kill the process if running */
 	$pfile = g_get('varrun_path')."/openvpn_{$mode_id}.pid";
 	if (file_exists($pfile)) {
 
@@ -1566,6 +1563,16 @@ function openvpn_restart($mode, $settings) {
 			$i++;
 		}
 	}
+}
+
+function openvpn_restart($mode, $settings) {
+	global $g;
+
+	$vpnid = $settings['vpnid'];
+	$mode_id = openvpn_name($mode, $settings, 'generic');
+	$lockhandle = lock("openvpnservice{$mode_id}", LOCK_EX);
+	openvpn_reconfigure($mode, $settings);
+	openvpn_stop_process($mode, $settings);
 
 	if (isset($settings['disable'])) {
 		openvpn_delete($mode, $settings);
@@ -1602,6 +1609,7 @@ function openvpn_restart($mode, $settings) {
 	$res = mwexec("/usr/local/sbin/openvpn --config " . escapeshellarg($fpath));
 	if ($res == 0) {
 		$i = 0;
+		$pfile = g_get('varrun_path')."/openvpn_{$mode_id}.pid";
 		$pid = "--";
 		while ($i < 3000) {
 			if (isvalidpid($pfile)) {
@@ -1627,17 +1635,7 @@ function openvpn_delete($mode, $settings) {
 	$vpnid = $settings['vpnid'];
 	$mode_id = openvpn_name($mode, $settings, 'generic');
 
-	/* kill the process if running */
-	$pfile = "{$g['varrun_path']}/openvpn_{$mode_id}.pid";
-	if (file_exists($pfile)) {
-
-		/* read the pid file */
-		$pid = trim(file_get_contents($pfile));
-		unlink($pfile);
-
-		/* send a term signal to the process */
-		posix_kill($pid, SIGTERM);
-	}
+	openvpn_stop_process($mode, $settings);
 
 	/* destroy the device */
 	pfSense_interface_destroy(openvpn_name($mode, $settings));
@@ -1840,7 +1838,6 @@ function openvpn_resync_csc($settings) {
 }
 
 function openvpn_resync_csc_all() {
-	config_init_path('openvpn/openvpn-csc');
 	foreach (config_get_path('openvpn/openvpn-csc', []) as $settings) {
 		openvpn_resync_csc($settings);
 	}
@@ -1884,8 +1881,6 @@ function openvpn_resync_all($interface = "", $protocol = "") {
 	}
 
 	// Check if OpenVPN clients and servers require a resync.
-	config_init_path('openvpn/openvpn-server');
-	config_init_path('openvpn/openvpn-client');
 	foreach (array("server", "client") as $type) {
 		foreach (config_get_path("openvpn/openvpn-{$type}", []) as & $settings) {
 			if (isset($settings['disable'])) {
@@ -1925,6 +1920,8 @@ function openvpn_resync_all($interface = "", $protocol = "") {
 		/* configure OpenVPN-parent QinQ interfaces after creating OpenVPN interfaces
 		 * see https://redmine.pfsense.org/issues/11662 */
 		if (is_platform_booting()) {
+			/* Refresh the cache; the parent interface may not yet exist in the cache. */
+			get_interface_arr(true);
 			interfaces_qinq_configure(true);
 			/* Configure all qinq interface addresses and add them to their
 			 * bridges. See https://redmine.pfsense.org/issues/13225,
@@ -2324,8 +2321,6 @@ function openvpn_create_dirs() {
 		safe_mkdir(g_get('openvpn_base'), 0750);
 	}
 
-	config_init_path('openvpn/openvpn-server');
-	config_init_path('openvpn/openvpn-client');
 	foreach(array('server', 'client') as $mode) {
 		foreach (config_get_path("openvpn/openvpn-{$mode}", []) as $settings) {
 			if (isset($settings['disable'])) {
@@ -2472,8 +2467,6 @@ function openvpn_gen_route_ipv6($network, $iroute = false) {
 }
 
 function openvpn_get_settings($mode, $vpnid) {
-	config_init_path('openvpn/openvpn-server');
-	config_init_path('openvpn/openvpn-client');
 	foreach (["server", "client"] as $mode) {
 		foreach (config_get_path("openvpn/openvpn-{$mode}", []) as $settings) {
 			if (isset($settings['disable'])) {
@@ -2505,8 +2498,6 @@ function openvpn_restart_by_vpnid($mode, $vpnid) {
  ******/
 
 function openvpn_is_tunnel_network_in_use($net) {
-	config_init_path('openvpn/openvpn-server');
-	config_init_path('openvpn/openvpn-client');
 	/* Determine whether to check IPv4 or IPv6 tunnel networks */
 	$tocheck = 'tunnel_network';
 	if (is_v6($net)) {

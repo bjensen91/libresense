@@ -99,13 +99,9 @@ if ($_REQUEST['ajax']) {
 	exit;
 }
 
-$id = $_REQUEST['id'];
-
-config_init_path('system/authserver');
+$id = is_numericint($_REQUEST['id']) ? $_REQUEST['id'] : null;
 
 $a_server = array_values(auth_get_authserver_list());
-
-config_init_path('ca');
 
 $act = $_REQUEST['act'];
 

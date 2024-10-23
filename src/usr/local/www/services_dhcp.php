@@ -119,17 +119,15 @@ if (!empty(config_get_path("dhcpd/{$if}"))) {
 		exit;
 	}
 
-	config_init_path("dhcpd/{$if}/pool");
-
 	if (is_numeric($pool) && config_get_path("dhcpd/{$if}/pool/{$pool}")) {
 		$dhcpdconf = config_get_path("dhcpd/{$if}/pool/{$pool}");
 	} elseif ($act == "newpool") {
 		$dhcpdconf = array();
 	} else {
-		$dhcpdconf = config_get_path("dhcpd/{$if}");
+		$dhcpdconf = config_get_path("dhcpd/{$if}", []);
 	}
 
-	array_init_path($dhcpd_if_config, "staticmap");
+	array_init_path($dhcpdconf, "staticmap");
 }
 
 if (is_array($dhcpdconf)) {
@@ -613,8 +611,7 @@ if (isset($_POST['save'])) {
 			if ($act == "newpool") {
 				$dhcpdconf = array();
 			} else {
-				config_init_path("dhcpd/{$if}");
-				$dhcpdconf = config_get_path("dhcpd/{$if}");
+				$dhcpdconf = config_get_path("dhcpd/{$if}", []);
 			}
 		} else {
 			if (is_array(config_get_path("dhcpd/{$if}/pool/{$pool}"))) {
@@ -998,7 +995,7 @@ if (dhcp_is_backend('kea')) {
 }
 
 foreach ($iflist as $ifent => $ifname) {
-	$oc = config_get_path("interfaces/{$ifent}");
+	$oc = config_get_path("interfaces/{$ifent}", []);
 
 	/* Not static IPv4 or subnet >= 31 */
 	if ($oc['subnet'] >= 31) {
@@ -1034,9 +1031,13 @@ if ($tabscounter == 0) {
 
 display_top_tabs($tab_array);
 
+if (is_null($pconfig) || !is_array($pconfig)) {
+	$pconfig = [];
+}
+
 $form = new Form();
 
-$section = new Form_Section(gettext('General DHCP Options'));
+$section = new Form_Section(gettext('General Settings'));
 
 $section->addInput(new Form_StaticText(
 	gettext('DHCP Backend'),
@@ -1059,7 +1060,7 @@ if (!is_numeric($pool) && !($act == "newpool")) {
 		$section->addInput(new Form_Checkbox(
 			'enable',
 			gettext('Enable'),
-			sprintf(gettext("Enable DHCP server on %s interface"), htmlspecialchars($iflist[$if])),
+			sprintf(gettext("Enable DHCP server on %s interface"), $iflist[$if]),
 			$pconfig['enable']
 		));
 	}
@@ -1201,7 +1202,7 @@ if (!is_numeric($pool) && !($act == "newpool")) {
 	$btnaddpool = new Form_Button(
 		'btnaddpool',
 		gettext('Add Address Pool'),
-		'services_dhcp.php?if=' . htmlspecialchars($if) . '&act=newpool',
+		'services_dhcp.php?if=' . $if . '&act=newpool',
 		'fa-solid fa-plus'
 	);
 	$btnaddpool->addClass('btn-success');
@@ -1905,15 +1906,15 @@ if (!is_numeric($pool) && !($act == "newpool")) {
 				<thead>
 					<tr>
 						<th><?=gettext("Static ARP")?></th>
-						<th><?=gettext("MAC address")?></th>
+						<th><?=gettext("MAC Address")?></th>
 <?php
 	if ($got_cid):
 ?>
-						<th><?=gettext("Client Id")?></th>
+						<th><?=gettext("Client ID")?></th>
 <?php
 	endif;
 ?>
-						<th><?=gettext("IP address")?></th>
+						<th><?=gettext("IP Address")?></th>
 						<th><?=gettext("Hostname")?></th>
 						<th><?=gettext("Description")?></th>
 						<th></th>
@@ -1954,8 +1955,8 @@ if (!is_numeric($pool) && !($act == "newpool")) {
 						<?=htmlspecialchars($mapent['descr'])?>
 					</td>
 					<td>
-						<a class="fa-solid fa-pencil"	title="<?=gettext('Edit static mapping')?>"	href="services_dhcp_edit.php?if=<?=htmlspecialchars($if)?>&amp;id=<?=$i?>"></a>
-						<a class="fa-solid fa-trash-can"	title="<?=gettext('Delete static mapping')?>"	href="services_dhcp.php?if=<?=htmlspecialchars($if)?>&amp;act=del&amp;id=<?=$i?>" usepost></a>
+						<a class="fa-solid fa-pencil" title="<?=gettext('Edit static mapping')?>"	href="services_dhcp_edit.php?if=<?=htmlspecialchars($if)?>&amp;id=<?=$i?>"></a>
+						<a class="fa-solid fa-trash-can text-danger" title="<?=gettext('Delete static mapping')?>"	href="services_dhcp.php?if=<?=htmlspecialchars($if)?>&amp;act=del&amp;id=<?=$i?>" usepost></a>
 					</td>
 				</tr>
 <?php

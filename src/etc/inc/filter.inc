@@ -323,7 +323,7 @@ function filter_delete_states_for_down_gateways() {
 				$message = gettext("GW States: Killing states for") . " {$what_to_kill}: {$gateway['name']}, {$gwip}";
 				update_filter_reload_status($message);
 				log_error($message);
-				mwexec("/sbin/pfctl -k gateway -k " . escapeshellarg($gwip));
+				mwexec("/sbin/pfctl -M -k gateway -k " . escapeshellarg($gwip));
 			}
 		}
 	}
@@ -515,6 +515,7 @@ function filter_configure_sync($delete_states_if_needed = true) {
 	 * 'cpzoneid_X_auth' - add PASS tag to authenticated client
 	 */
 	$rules .= filter_captiveportal_ether();
+	$rules .= PHP_EOL;
 
 	update_filter_reload_status(gettext("Setting up SCRUB information"));
 	$rules .= filter_generate_scrubbing();
@@ -608,7 +609,6 @@ function filter_configure_sync($delete_states_if_needed = true) {
 
 	// get aliases names from config
 	$aliasesnames = array();
-	config_init_path('aliases/alias');
 	foreach (config_get_path('aliases/alias', []) as $alias) {
 		array_push($aliasesnames, $alias['name']);
 	}
@@ -884,6 +884,118 @@ function filter_expand_alias_array($alias_name) {
 	return explode(" ", preg_replace('/\s+/', ' ', trim($expansion)));
 }
 
+function filter_generate_alias_tables(array $alias_list = []) {
+	global $after_filter_configure_run, $vpns_list;
+
+	$aliases = '';
+
+	$process_ids_header = true;
+	$process_bogons = true;
+	foreach ($alias_list as $aliased) {
+		if (is_numericint($aliased['name'])) {
+			// skip aliases with numeric-only names. redmine #4289
+			file_notice("Filter_Reload", sprintf(gettext("Aliases with numeric-only names are not valid. Skipping alias %s"), $aliased['name']));
+			continue;
+		}
+		$addrlist = filter_generate_nested_alias($aliased['name']);
+		switch ($aliased['type']) {
+		case "host":
+			if ($aliased['name'] == 'sshguard') {
+				$aliases .= "\n#SSH Lockout Table\n";
+				$aliases .= "table <sshguard> persist\n";
+				break;
+			}
+			if (($aliased['name'] == 'snort2c') || ($aliased['name'] == 'virusprot')) {
+				if ($process_ids_header) {
+					$aliases .= "#Snort tables\n";
+					$process_ids_header = false;
+				}
+				$aliases .= "table <{$aliased['name']}>\n";
+				break;
+			}
+		case "network":
+			if ($aliased['name'] == 'tonatsubnets') {
+				// Added in filter_nat_rules_generate().
+				break;
+			} elseif ($aliased['name'] == 'vpn_networks') {
+				if ($vpns_list) {
+					$aliases .= "table <vpn_networks> { $vpns_list }\n";
+				}
+				break;
+			} elseif ($aliased['name'] == 'negate_networks') {
+				if ($vpns_list && !config_path_enabled('system','disablenegate')) {
+					$aliases .= "table <negate_networks> { $vpns_list }\n";
+				}
+				break;
+			}
+		case "url":
+			$tableaddrs = "{$addrlist}";
+			if (empty($tableaddrs)) {
+				$aliases .= "table <{$aliased['name']}> persist\n";
+				if (empty($aliased['address'])) {
+					$after_filter_configure_run[] = "/sbin/pfctl -T flush -t " . escapeshellarg($aliased['name']);
+				}
+			} else {
+				$aliases .= "table <{$aliased['name']}> { {$addrlist} } \n";
+			}
+
+			$aliases .= "{$aliased['name']} = \"<{$aliased['name']}>\"\n";
+			break;
+		case "urltable":
+			if ($process_bogons && (($aliased['name'] == 'bogonsv6') || ($aliased['name'] == 'bogonsv6'))) {
+				$process_bogons = false;
+				if (!file_exists("/etc/bogons")) {
+					@file_put_contents("/etc/bogons", "");
+				}
+				if (!file_exists("/etc/bogonsv6")) {
+					@file_put_contents("/etc/bogonsv6", "");
+				}
+
+				$aliases .= "table <bogons> persist file \"/etc/bogons\"\n";
+				$aliases .= "bogons = \"<bogons>\"\n";
+
+				if (!is_bogonsv6_used()) {
+					break;
+				}
+				$maxtableents = config_get_path('system/maximumtableentries');
+				if (!isset($maxtableents) || ($maxtableents < g_get('minimumtableentries_bogonsv6'))) {
+					file_notice("Filter_Reload", sprintf(gettext(
+						"To block bogon IPv6 networks the Firewall Maximum Table Entries value in System / Advanced / Firewall must be increased at least to %s"),
+						g_get('minimumtableentries_bogonsv6')));
+				} else {
+					$aliases .= "table <bogonsv6> persist file \"/etc/bogonsv6\"\n";
+					$aliases .= "bogonsv6 = \"<bogonsv6>\"\n";
+				}
+				break;
+			}
+
+			$urlfn = alias_expand_urltable($aliased['name']);
+			if ($urlfn) {
+				$aliases .= "table <{$aliased['name']}> persist file \"{$urlfn}\"\n";
+				$aliases .= "{$aliased['name']} = \"<{$aliased['name']}>\"\n";
+			}
+			break;
+		case "urltable_ports":
+			// TODO: Change it when pf supports tables with ports
+			$urlfn = alias_expand_urltable($aliased['name']);
+			if ($urlfn && !empty(trim(file_get_contents($urlfn)))) {
+				$ports_tmp = parse_aliases_file($urlfn, "urltable_ports", "-1", false);
+				$aliases .= "{$aliased['name']} = \"{ " . preg_replace("/\n/", " ", implode("\n", $ports_tmp)) . " }\"\n";
+			}
+			break;
+		case "port":
+		case "url_ports":
+			$aliases .= "{$aliased['name']} = \"{ {$addrlist} }\"\n";
+			break;
+		default:
+			$aliases .= "{$aliased['name']} = \"{ {$aliased['address']} }\"\n";
+			break;
+		}
+	}
+
+	return $aliases;
+}
+
 function filter_generate_aliases() {
 	global $g, $FilterIflist, $after_filter_configure_run, $vpns_list;
 
@@ -892,7 +1004,7 @@ function filter_generate_aliases() {
 		echo "filter_generate_aliases() being called $mt\n";
 	}
 
-	$alias = "#System aliases\n ";
+	$result = "#System aliases\n";
 	$aliases = "loopback = \"{ lo0 }\"\n";
 
 	foreach ($FilterIflist as $if => $ifcfg) {
@@ -959,40 +1071,7 @@ function filter_generate_aliases() {
 		}
 	}
 
-	$aliases .= "\n#SSH Lockout Table\n";
-	$aliases .= "table <sshguard> persist\n";
-
-	$aliases .= "#Snort tables\n";
-	$aliases .= "table <snort2c>\n";
-	$aliases .= "table <virusprot>\n";
-	if (!file_exists("/etc/bogons") || !file_exists("/etc/bogonsv6")) {
-		if (!file_exists("/etc/bogons")) {
-			@file_put_contents("/etc/bogons", "");
-		}
-		if (!file_exists("/etc/bogonsv6")) {
-			@file_put_contents("/etc/bogonsv6", "");
-		}
-	}
-	$aliases .= "table <bogons> persist file \"/etc/bogons\"\n";
-	if (is_bogonsv6_used()) {
-		$maxtableents = config_get_path('system/maximumtableentries');
-		if (!isset($maxtableents) ||
-			$maxtableents < g_get('minimumtableentries_bogonsv6')) {
-			file_notice("Filter_Reload", sprintf(gettext(
-			    "To block bogon IPv6 networks the Firewall Maximum Table Entries value in System / Advanced / Firewall must be increased at least to %s"),
-			    g_get('minimumtableentries_bogonsv6')));
-		} else {
-			$aliases .= "table <bogonsv6> persist file \"/etc/bogonsv6\"\n";
-		}
-	}
-
-	if ($vpns_list) {
-		$aliases .= "table <vpn_networks> { $vpns_list }\n";
-		/* add a Negate_networks table */
-		if (!config_path_enabled('system','disablenegate')) {
-			$aliases .= "table <negate_networks> { $vpns_list }\n";
-		}
-	}
+	$aliases .= filter_generate_alias_tables(get_reserved_table_names());
 
 	/* Captive Portal tables
 	 * 'cpzoneid_X_cpips' - all portal interfaces IPv4 addresses (including VIPs)
@@ -1004,55 +1083,8 @@ function filter_generate_aliases() {
 	$aliases .= "\n# User Aliases \n";
 	/* Setup pf groups */
 
-	foreach (get_sorted_aliases() as $aliased) {
-		if (is_numericint($aliased['name'])) {
-			// skip aliases with numeric-only names. redmine #4289
-			file_notice("Filter_Reload", sprintf(gettext("Aliases with numeric-only names are not valid. Skipping alias %s"), $aliased['name']));
-			continue;
-		}
-		$addrlist = filter_generate_nested_alias($aliased['name']);
-		switch ($aliased['type']) {
-		case "host":
-		case "network":
-		case "url":
-			$tableaddrs = "{$addrlist}";
-			if (empty($tableaddrs)) {
-				$aliases .= "table <{$aliased['name']}> persist\n";
-				if (empty($aliased['address'])) {
-					$after_filter_configure_run[] = "/sbin/pfctl -T flush -t " . escapeshellarg($aliased['name']);
-				}
-			} else {
-				$aliases .= "table <{$aliased['name']}> { {$addrlist} } \n";
-			}
+	$aliases .= filter_generate_alias_tables(get_sorted_aliases());
 
-			$aliases .= "{$aliased['name']} = \"<{$aliased['name']}>\"\n";
-			break;
-		case "urltable":
-			$urlfn = alias_expand_urltable($aliased['name']);
-			if ($urlfn) {
-				$aliases .= "table <{$aliased['name']}> persist file \"{$urlfn}\"\n";
-				$aliases .= "{$aliased['name']} = \"<{$aliased['name']}>\"\n";
-			}
-			break;
-		case "urltable_ports":
-			// TODO: Change it when pf supports tables with ports
-			$urlfn = alias_expand_urltable($aliased['name']);
-			if ($urlfn && !empty(trim(file_get_contents($urlfn)))) {
-				$ports_tmp = parse_aliases_file($urlfn, "urltable_ports", "-1", false);
-				$aliases .= "{$aliased['name']} = \"{ " . preg_replace("/\n/", " ", implode("\n", $ports_tmp)) . " }\"\n";
-			}
-			break;
-		case "port":
-		case "url_ports":
-			$aliases .= "{$aliased['name']} = \"{ {$addrlist} }\"\n";
-			break;
-		default:
-			$aliases .= "{$aliased['name']} = \"{ {$aliased['address']} }\"\n";
-			break;
-		}
-
-	}
-	$result = "{$alias} \n";
 	$result .= "{$aliases}";
 
 	return $result;
@@ -1162,7 +1194,7 @@ function filter_generate_gateways() {
 						}
 						$foundlb++;
 					} else {
-						log_error(sprintf(gettext("An error occurred while trying to find the interface got %s .  The rule has not been added."), $gatewayip));
+						log_error(sprintf(gettext('Omitting gateway from filter ruleset. Group: "%s" Gateway: "%s" IP: "%s"'), $gateway, $member['gw'], $gatewayip));
 					}
 				}
 				$route = "";
@@ -1223,7 +1255,7 @@ function filter_get_vpns_list() {
 			}
 		}
 		foreach (config_get_path('ipsec/phase2', []) as $ph2ent) {
-			if ((!$ph2ent['mobile']) && ($ph2ent['mode'] != 'transport') &&
+			if ((!isset($ph2ent['mobile'])) && ($ph2ent['mode'] != 'transport') &&
 				!isset($ph2ent['disabled'])) {
 				if (!is_array($ph2ent['remoteid'])) {
 					continue;
@@ -1971,7 +2003,6 @@ function filter_nat_rules_automatic_tonathosts($with_descr = false) {
 	}
 
 	// OpenVPN CSO
-	config_init_path('openvpn/openvpn-csc');
 	foreach (config_get_path('openvpn/openvpn-csc', []) as $ovpnent) {
 		if (is_array($ovpnent) && !isset($ovpnent['disable']) && !empty($ovpnent['tunnel_network'])) {
 			$tonathosts[] = implode('/', openvpn_gen_tunnel_network($ovpnent['tunnel_network']));
@@ -2238,8 +2269,7 @@ EOD;
 function filter_nat_rules_generate() {
 	global $g, $FilterIflist;
 
-	config_init_path('ipsec/client');
-	$ipsec_client = config_get_path('ipsec/client');
+	$ipsec_client = config_get_path('ipsec/client', []);
 
 	$natrules = "no nat proto carp\n";
 	$natrules .= "no rdr proto carp\n";
@@ -2499,7 +2529,9 @@ function filter_nat_rules_generate() {
 				/* validate source alias */
 				if (empty($src)) {
 					$error_text = sprintf(gettext("Unresolvable source alias '%1\$s' for rule '%2\$s'"), $src, $descr);
-					file_notice("Filter_Reload", $error_text);
+					if (!is_platform_booting()) {
+						file_notice("Filter_Reload", $error_text);
+					}
 					$natrules .= "# {$error_text}\n";
 					continue;
 				}
@@ -2513,7 +2545,9 @@ function filter_nat_rules_generate() {
 					$error_text = sprintf(gettext("Empty source port alias '%1\$s' for rule '%2\$s'"), $obent['sourceport'], $descr);
 				}
 				if ($error_text) {
-					file_notice("Filter_Reload", $error_text);
+					if (!is_platform_booting()) {
+						file_notice("Filter_Reload", $error_text);
+					}
 					$natrules .= "# {$error_text}\n";
 					continue;
 				}
@@ -2525,7 +2559,9 @@ function filter_nat_rules_generate() {
 				/* validate destination alias */
 				if (empty($dst)) {
 					$error_text = sprintf(gettext("Unresolvable destination alias '%1\$s' for rule '%2\$s'"), $dst, $descr);
-					file_notice("Filter_Reload", $error_text);
+					if (!is_platform_booting()) {
+						file_notice("Filter_Reload", $error_text);
+					}
 					$natrules .= "# {$error_text}\n";
 					continue;
 				}
@@ -2539,7 +2575,9 @@ function filter_nat_rules_generate() {
 					$error_text = sprintf(gettext("Empty destination port alias '%1\$s' for rule '%2\$s'"), $obent['dstport'], $descr);
 				}
 				if ($error_text) {
-					file_notice("Filter_Reload", $error_text);
+					if (!is_platform_booting()) {
+						file_notice("Filter_Reload", $error_text);
+					}
 					$natrules .= "# {$error_text}\n";
 					continue;
 				}
@@ -3372,12 +3410,16 @@ function filter_generate_user_rule($rule, & $extralabels = null) {
 	/* check for unresolvable aliases */
 	if ($rule['source']['address'] && !alias_expand($rule['source']['address'])) {
 		$error_text = sprintf(gettext("Unresolvable source alias '%1\$s' for rule '%2\$s'"), $rule['source']['address'], $rule['descr']);
-		file_notice("Filter_Reload", $error_text);
+		if (!is_platform_booting()) {
+			file_notice("Filter_Reload", $error_text);
+		}
 		return "# {$error_text}";
 	}
 	if ($rule['destination']['address'] && !alias_expand($rule['destination']['address'])) {
 		$error_text = sprintf(gettext("Unresolvable destination alias '%1\$s' for rule '%2\$s'"), $rule['destination']['address'], $rule['descr']);
-		file_notice("Filter_Reload", $error_text);
+		if (!is_platform_booting()) {
+			file_notice("Filter_Reload", $error_text);
+		}
 		return "# {$error_text}";
 	}
 	if ($rule['source']['port'] &&
@@ -3393,7 +3435,9 @@ function filter_generate_user_rule($rule, & $extralabels = null) {
 		}
 
 		if ($error_text) {
-			file_notice("Filter_Reload", $error_text);
+			if (!is_platform_booting()) {
+				file_notice("Filter_Reload", $error_text);
+			}
 			return "# {$error_text}";
 		}
 	}
@@ -3410,7 +3454,9 @@ function filter_generate_user_rule($rule, & $extralabels = null) {
 		}
 
 		if ($error_text) {
-			file_notice("Filter_Reload", $error_text);
+			if (!is_platform_booting()) {
+				file_notice("Filter_Reload", $error_text);
+			}
 			return "# {$error_text}";
 		}
 	}
@@ -3935,6 +3981,7 @@ EOD;
 	 * Useful for protecting against sudden outbursts, etc.
 	 */
 	$ipfrules .= "block in {$log['block']} quick from <virusprot> to any ridentifier 1000000400 label \"virusprot overload table\"\n";
+	$ipfrules .= "block out quick proto udp from any port = 67 to any port = 68 tagged \"dhcpin\" ridentifier {$increment_tracker()} label \"Prevent routing dhcp responses\"\n";
 
 	foreach ($FilterIflist as $on => $oc) {
 		$saved_tracker += 10;
@@ -3948,8 +3995,8 @@ EOD;
 			}
 			$ipfrules .= <<<EOD
 # allow our DHCP client out to the {$oc['descr']}
-pass in {$log['pass']} quick on \${$oc['descr']} proto udp from any port = 67 to any port = 68 ridentifier {$increment_tracker()} label "{$fix_rule_label("allow dhcp replies in {$oc['descr']}")}"
-pass out {$log['pass']} quick on \${$oc['descr']} proto udp from any port = 68 to any port = 67 ridentifier {$increment_tracker()} label "{$fix_rule_label("allow dhcp client out {$oc['descr']}")}" {$vlantag}
+pass in {$log['pass']} quick on \${$oc['descr']} proto udp from any port = 67 to any port = 68 tag "dhcpin" no state ridentifier {$increment_tracker()} label "{$fix_rule_label("allow dhcp replies in {$oc['descr']}")}"
+pass out {$log['pass']} quick on \${$oc['descr']} proto udp from any port = 68 to any port = 67 no state ridentifier {$increment_tracker()} label "{$fix_rule_label("allow dhcp client out {$oc['descr']}")}" {$vlantag}
 # Not installing DHCP server firewall rules for {$oc['descr']} which is configured for DHCP.
 
 EOD;
@@ -4501,7 +4548,6 @@ function filter_tdr_install_cron($should_install) {
 		return;
 	}
 
-	config_init_path('cron/item');
 	$x = 0;
 	$is_installed = false;
 	foreach (config_get_path('cron/item', []) as $item) {
@@ -4815,7 +4861,7 @@ function filter_generate_ipsec_rules($log = array()) {
 			} else {
 				$parentinterface = $ph1ent['interface'];
 			}
-			if (empty($FilterIflist[$parentinterface]['descr'])) {
+			if (empty($parentinterface) || empty($FilterIflist[$parentinterface]['descr'])) {
 				$ipfrules .= "# Could not locate interface for IPsec: {$descr}\n";
 				continue;
 			}

@@ -34,9 +34,6 @@ require_once("service-utils.inc");
 require_once("ipsec.inc");
 
 // Should always be initialized
-config_init_path('ipsec/phase1');
-config_init_path('ipsec/phase2');
-
 $ipsec_widget_tabs = array(
 	'overview' => gettext('Overview'),
 	'tunnel' => gettext('Tunnels'),
@@ -434,7 +431,7 @@ events.push(function(){
 	ipsecObject.url = "/widgets/widgets/ipsec.widget.php";
 	ipsecObject.callback = ipsec_callback;
 	ipsecObject.parms = postdata;
-	ipsecObject.freq = 1;
+	ipsecObject.freq = 5;
 
 	// Register the AJAX object
 	register_ajax(ipsecObject);

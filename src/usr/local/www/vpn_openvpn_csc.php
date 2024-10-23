@@ -36,9 +36,6 @@ require_once("pkg-utils.inc");
 
 global $openvpn_tls_server_modes, $openvpn_ping_action;
 
-config_init_path('openvpn/openvpn-csc');
-config_init_path('openvpn/openvpn-server');
-
 $serveroptionlist = array();
 foreach (config_get_path('openvpn/openvpn-server', []) as $serversettings) {
 	if (in_array($serversettings['mode'], $openvpn_tls_server_modes)) {
@@ -89,7 +86,7 @@ if (($act == "edit") || ($act == "dup")) {
 			$pconfig['override_options'] = 'push_reset';
 		}
 
-		$pconfig['server_list'] = explode(",", $this_csc_config['server_list']);
+		$pconfig['server_list'] = array_filter(explode(",", $this_csc_config['server_list']));
 		$pconfig['custom_options'] = $this_csc_config['custom_options'];
 		$pconfig['disable'] = isset($this_csc_config['disable']);
 		$pconfig['common_name'] = $this_csc_config['common_name'];

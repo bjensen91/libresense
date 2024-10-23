@@ -35,9 +35,6 @@ require_once("pfsense-utils.inc");
 
 global $cert_strict_values, $curve_compatible_list;
 
-config_init_path('ca');
-config_init_path('cert');
-
 $type = $_REQUEST['type'];
 
 switch ($type) {
@@ -137,7 +134,7 @@ print_info_box(gettext('Renewing or reissuing a CA or certificate will replace t
 $form = new Form(false);
 $form->setAction('system_certmanager_renew.php');
 
-$section = new Form_Section("Renew or Reissue: " . htmlspecialchars($torenew['descr']));
+$section = new Form_Section("Renew or Reissue: " . $torenew['descr']);
 
 $section->addInput(new Form_StaticText(
 	"Subject",

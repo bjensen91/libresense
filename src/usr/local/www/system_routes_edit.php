@@ -39,10 +39,9 @@ require_once("gwlb.inc");
 
 $referer = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/system_routes.php');
 
-config_init_path('staticroutes/route');
 $a_gateways = get_gateways(GW_CACHE_DISABLED | GW_CACHE_LOCALHOST);
 
-$id = $_REQUEST['id'];
+$id = is_numericint($_REQUEST['id']) ? $_REQUEST['id'] : null;
 
 if (isset($_REQUEST['dup']) && is_numericint($_REQUEST['dup'])) {
 	$id = $_REQUEST['dup'];
@@ -273,7 +272,7 @@ $section->addInput(new Form_Input(
 	'descr',
 	gettext('Description'),
 	'text',
-	htmlspecialchars($pconfig['descr'])
+	$pconfig['descr']
 ))->setHelp(gettext('A description may be entered here for administrative reference (not parsed).'));
 
 $form->add($section);
@@ -285,7 +284,7 @@ print $form;
 //<![CDATA[
 events.push(function() {
 	// --------- Autocomplete -----------------------------------------------------------------------------------------
-	var addressarray = <?= json_encode(get_alias_list(array("host", "network"))) ?>;
+	var addressarray = <?= json_encode(get_alias_list('host,network')) ?>;
 
 	$('#network').autocomplete({
 		source: addressarray

@@ -2156,13 +2156,14 @@ function session_auth() {
 
 	// Handle HTTPS httponly and secure flags
 	$currentCookieParams = session_get_cookie_params();
-	session_set_cookie_params(
-		$currentCookieParams["lifetime"],
-		$currentCookieParams["path"],
-		NULL,
-		(config_get_path('system/webgui/protocol') == "https"),
-		true
-	);
+	session_set_cookie_params([
+		'lifetime' => $currentCookieParams["lifetime"],
+		'path' => $currentCookieParams["path"],
+		'domain' => NULL,
+		'secure' => (config_get_path('system/webgui/protocol') == "https"),
+		'httponly' => true,
+		'samesite' => 'Strict'
+	]);
 
 	phpsession_begin();
 
@@ -2254,9 +2255,9 @@ function session_auth() {
 	if (isset($_POST['logout'])) {
 
 		if ($_SESSION['Logout']) {
-			log_error(sprintf(gettext("Session timed out for user '%1\$s' from: %2\$s"), $_SESSION['Username'], get_user_remote_address() . get_user_remote_authsource()));
+			log_auth(sprintf(gettext("Session timed out for user '%1\$s' from: %2\$s"), $_SESSION['Username'], get_user_remote_address() . get_user_remote_authsource()), true);
 		} else {
-			log_error(sprintf(gettext("User logged out for user '%1\$s' from: %2\$s"), $_SESSION['Username'], get_user_remote_address() . get_user_remote_authsource()));
+			log_auth(sprintf(gettext("User logged out for user '%1\$s' from: %2\$s"), $_SESSION['Username'], get_user_remote_address() . get_user_remote_authsource()), true);
 		}
 
 		/* wipe out $_SESSION */

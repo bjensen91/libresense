@@ -75,17 +75,13 @@ if (!empty(config_get_path("dhcpdv6/{$if}"))) {
 		exit;
 	}
 
-	config_init_path("dhcpdv6/{$if}/pool");
-
 	if (is_numeric($pool) && config_get_path("dhcpdv6/{$if}/pool/{$pool}")) {
 		$dhcpdconf = config_get_path("dhcpdv6/{$if}/pool/{$pool}");
 	} elseif ($act === 'newpool') {
 		$dhcpdconf = [];
 	} else {
-		$dhcpdconf = config_get_path("dhcpdv6/{$if}");
+		$dhcpdconf = config_get_path("dhcpdv6/{$if}", []);
 	}
-
-	config_init_path("dhcpdv6/{$if}/staticmap");
 }
 
 if (is_array($dhcpdconf)) {
@@ -418,8 +414,7 @@ if (isset($_POST['apply'])) {
 			if ($act === 'newpool') {
 				$dhcpdconf = [];
 			} else {
-				config_init_path("dhcpdv6/{$if}");
-				$dhcpdconf = config_get_path("dhcpdv6/{$if}");
+				$dhcpdconf = config_get_path("dhcpdv6/{$if}", []);
 			}
 		} else {
 			if (is_array(config_get_path("dhcpdv6/{$if}/pool/{$pool}"))) {
@@ -660,9 +655,7 @@ if (dhcp_is_backend('kea')) {
 }
 
 foreach ($iflist as $ifent => $ifname) {
-	config_init_path("dhcpdv6/{$ifent}");
-
-	$oc = config_get_path("interfaces/{$ifent}");
+	$oc = config_get_path("interfaces/{$ifent}", []);
 	$valid_if_ipaddrv6 = (bool) ($oc['ipaddrv6'] == 'track6' ||
 	    (is_ipaddrv6($oc['ipaddrv6']) &&
 	    !is_linklocal($oc['ipaddrv6'])));
@@ -693,9 +686,13 @@ if ($dhcrelay_enabled) {
 
 display_top_tabs($tab_array);
 
+if (is_null($pconfig) || !is_array($pconfig)) {
+	$pconfig = [];
+}
+
 $form = new Form();
 
-$section = new Form_Section(gettext('General DHCPv6 Options'));
+$section = new Form_Section(gettext('General Settings'));
 
 $section->addInput(new Form_StaticText(
 	gettext('DHCP Backend'),
@@ -718,7 +715,7 @@ if (!is_numeric($pool) && !($act === 'newpool')) {
 		$section->addInput(new Form_Checkbox(
 			'enable',
 			gettext('Enable'),
-			sprintf(gettext('Enable DHCPv6 server on %s interface'), htmlspecialchars($iflist[$if])),
+			sprintf(gettext('Enable DHCPv6 server on %s interface'), $iflist[$if]),
 			$pconfig['enable']
 		));
 	}
@@ -860,7 +857,7 @@ if (!is_numeric($pool) && !($act === 'newpool')) {
 	$btnaddpool = new Form_Button(
 		'btnaddpool',
 		gettext('Add Address Pool'),
-		'services_dhcpv6.php?if=' . htmlspecialchars($if) . '&act=newpool',
+		'services_dhcpv6.php?if=' . $if . '&act=newpool',
 		'fa-solid fa-plus'
 	);
 	$btnaddpool->addClass('btn-success');
@@ -1379,8 +1376,8 @@ foreach (config_get_path("dhcpdv6/{$if}/staticmap", []) as $mapent):
 					<?=htmlspecialchars($mapent['descr'])?>
 				</td>
 				<td>
-					<a class="fa-solid fa-pencil"	title="<?=gettext('Edit static mapping')?>" href="services_dhcpv6_edit.php?if=<?=$if?>&amp;id=<?=$i?>"></a>
-					<a class="fa-solid fa-trash-can"	title="<?=gettext('Delete static mapping')?>" href="services_dhcpv6.php?if=<?=$if?>&amp;act=del&amp;id=<?=$i?>" usepost></a>
+					<a class="fa-solid fa-pencil" title="<?=gettext('Edit static mapping')?>" href="services_dhcpv6_edit.php?if=<?=$if?>&amp;id=<?=$i?>"></a>
+					<a class="fa-solid fa-trash-can text-danger" title="<?=gettext('Delete static mapping')?>" href="services_dhcpv6.php?if=<?=$if?>&amp;act=del&amp;id=<?=$i?>" usepost></a>
 				</td>
 			</tr>
 <?php

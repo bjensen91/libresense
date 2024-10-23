@@ -59,13 +59,17 @@ function pkg_valid_name($pkgname) {
 	return preg_match($pattern, $pkgname);
 }
 
-/* Remove pkg_prefix from package name if it's present */
+/* Remove pkg_prefix or flavor_prefix from package name if it's present */
 function pkg_remove_prefix(&$pkg_name) {
-	global $g;
-
-	if (substr($pkg_name, 0, strlen(g_get('pkg_prefix'))) ==
-	    g_get('pkg_prefix')) {
-		$pkg_name = substr($pkg_name, strlen(g_get('pkg_prefix')));
+	$pres = [g_get('pkg_prefix')];
+	if (!is_null(g_get('flavor_prefix'))) {
+		$pres[] = g_get('flavor_prefix');
+	}
+	foreach ( $pres as $pre) {
+		if (str_starts_with($pkg_name, $pre)) {
+			$pkg_name = substr($pkg_name, strlen($pre));
+			break;
+		}
 	}
 }
 
@@ -792,7 +796,6 @@ function install_package_xml($package_name) {
 	/* add package information to config.xml */
 	$pkgid = get_package_id($pkg_info['name']);
 	update_status(gettext("Saving updated package information...") . "\n");
-	config_init_path('installedpackages/package');
 	$pkgs = config_get_path('installedpackages/package', []);
 	if ($pkgid == -1) {
 		$pkgs[] = $pkg_info;
@@ -905,12 +908,12 @@ function install_package_xml($package_name) {
 	}
 	/* sidebar items */
 	if (is_array($pkg_config['menu'])) {
-		config_init_path('installedpackages/menu');
 		$menus = config_get_path('installedpackages/menu', []);
 		update_status(gettext("Menu items... "));
 		foreach ($pkg_config['menu'] as $menu) {
 			foreach ($menus as $amenu) {
-				if ($amenu['name'] == $menu['name']) {
+				if ((trim($amenu['name']) == trim($menu['name'])) &&
+				    ($amenu['section'] == $menu['section'])) {
 					continue 2;
 				}
 			}
@@ -920,7 +923,6 @@ function install_package_xml($package_name) {
 		update_status(gettext("done.") . "\n");
 	}
 	/* services */
-	config_init_path('installedpackages/service');
 	if (is_array($pkg_config['service'])) {
 		update_status(gettext("Services... "));
 		$services = config_get_path('installedpackages/service', []);
@@ -932,7 +934,7 @@ function install_package_xml($package_name) {
 				if (empty($aservice)) {
 					continue;
 				}
-				if ($aservice['name'] == $service['name']) {
+				if (trim($aservice['name']) == trim($service['name'])) {
 					continue 2;
 				}
 			}
@@ -942,7 +944,6 @@ function install_package_xml($package_name) {
 		update_status(gettext("done.") . "\n");
 	}
 	if (is_array($pkg_config['tabs'])) {
-		config_init_path("installedpackages/package/{$pkgid}/tabs");
 		config_set_path("installedpackages/package/{$pkgid}/tabs",$pkg_config['tabs']);
 	}
 	/* plugins */
@@ -950,7 +951,6 @@ function install_package_xml($package_name) {
 		config_set_path("installedpackages/package/{$pkgid}/include_file", $pkg_config['include_file']);
 	}
 	if (is_array($pkg_config['plugins'])) {
-		config_init_path("installedpackages/package/{$pkgid}/plugins");
 		config_set_path("installedpackages/package/{$pkgid}/plugins", $pkg_config['plugins']);
 	}
 
@@ -987,11 +987,8 @@ function delete_package_xml($package_name, $when = "post-deinstall") {
 	update_status(sprintf(gettext("Removing %s components..."),
 	    $package_name) . "\n");
 	/* parse package configuration */
-	config_init_path("installedpackages/package/{$pkgid}");
 	$pkg_info = config_get_path("installedpackages/package/{$pkgid}",[]);
-	config_init_path('installedpackages/menu');
 	$menus = config_get_path('installedpackages/menu', []);
-	config_init_path('installedpackages/service');
 	$services = config_get_path('installedpackages/service', []);
 	if (file_exists("/usr/local/pkg/" . $pkg_info['configurationfile'])) {
 		$pkg_config = parse_xml_config_pkg("/usr/local/pkg/" .
@@ -1555,43 +1552,50 @@ function pkg_switch_repo() {
 function update_repos() {
 	$product_name = g_get('product_name');
 	$pipes = [];
-	$descriptorspec = [
-		1 => ["pipe", "w"], /* stdout */
-		2 => ["pipe", "w"]  /* stderr */
+	$dspec = [
+		1 => ['pipe', 'w'], /* stdout */
+		2 => ['pipe', 'w']  /* stderr */
 	];
 	$rc = -1;
 	/* Default error message for failure cases. */
 	$fail_error = [
 		"error" => 1,
-		"messages" => ["Could not update connect to Netgate servers. Please try again later."]
+		"messages" => [gettext('Could not connect to Netgate servers. Please try again later.')]
 	];
 
 	/* Execute repoc with a full pkg style environment, including proxy
 	 * configuration. */
 	$process = proc_open(sprintf('/usr/local/sbin/%s-repoc -N', $product_name),
-	    $descriptorspec, $pipes, '/', pkg_env());
+	    $dspec, $pipes, '/', pkg_env());
 
 	/* Process failed to start */
 	if (!is_resource($process)) {
 		return $fail_error;
 	}
 
-	/* Read output */
-	$stdout = stream_get_contents($pipes[1]);
-	fclose($pipes[1]);
-	/* If stdout is boolean false, reading stdout failed. */
-	if ($stdout === false) {
-		return $fail_error;
-	}
-
-	/* Read errors */
-	$stderr = stream_get_contents($pipes[2]);
-	fclose($pipes[2]);
+	$timeout = 5; /* seconds */
+	$stdout = '';
+	do {
+		$start = microtime(true);
+		$r = ['stdout' => $pipes[1], 'stderr' => $pipes[2]];
+		$w = $e = null;
+		if (($n = stream_select($r, $w, $e, 0)) === false) {
+			$result = $fail_error;
+			goto error;
+		} else if ($n > 0) {
+			foreach ($r as $var => $fd) {
+				$$var .= fread($fd, 4096);
+			}
+		}
+		if (($timeout -= (microtime(true) - $start)) <= 0) {
+			$result = $fail_error;
+			goto error;
+		}
+	} while (!feof($pipes[1]) && !feof($pipes[2]));
 
 	/* Get return code */
-	$rc = proc_close($process);
 	$result = [
-		"error" => $rc,
+		"error" => proc_close($process),
 		"messages" => []
 	];
 
@@ -1599,13 +1603,18 @@ function update_repos() {
 	$stdout = explode("\n", trim($stdout));
 
 	if ((count($stdout) > 1) &&
-	    ($stdout[0] === "Messages:")) {
+	    ($stdout[0] === 'Messages:')) {
 		/* Copy over message content from the output. */
 		$result['messages'] = array_merge($result['messages'], array_slice($stdout, 1));
 	} elseif (!empty($stderr)) {
 		$result['messages'][] = $stderr;
 	}
 
-	return ($result);
+error:
+	if (is_resource($process)) {
+		proc_close($process);
+	}
+
+	return $result;
 }
 ?>

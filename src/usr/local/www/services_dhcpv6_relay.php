@@ -34,7 +34,7 @@ require_once('guiconfig.inc');
 
 $pconfig['enable'] = config_path_enabled('dhcrelay6');
 
-$pconfig['interface'] = explode(",", config_get_path('dhcrelay6/interface', ""));
+$pconfig['interface'] = array_filter(explode(",", config_get_path('dhcrelay6/interface', "")));
 
 $pconfig['agentoption'] = config_path_enabled('dhcrelay6', 'agentoption');
 $pconfig['server'] = config_get_path('dhcrelay6/server');
@@ -122,7 +122,6 @@ if ($_POST) {
 	$pconfig['server'] = $svrlist;
 
 	if (!$input_errors) {
-		config_init_path('dhcrelay6');
 		config_set_path('dhcrelay6/enable', $_POST['enable'] ? true : false);
 		if (isset($_POST['interface']) &&
 		    is_array($_POST['interface'])) {

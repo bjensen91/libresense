@@ -30,8 +30,7 @@
 /*
 header("Last-Modified: " . gmdate("D, j M Y H:i:s") . " GMT");
 header("Expires: " . gmdate("D, j M Y H:i:s", time()) . " GMT");
-header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP/1.1
-header("Pragma: no-cache"); // HTTP/1.0
+header("Cache-Control: no-cache, no-store, must-revalidate");
 */
 
 require_once("guiconfig.inc");
@@ -286,9 +285,10 @@ function processInterfaceQueues($altqstats, $parent_name) {
 	global $g;
 	global $if_queue_list;
 
-	$parent_name = $parent_name . " queuerow" . $altqstats['name'] . convert_real_interface_to_friendly_interface_name($altqstats['interface']);
+	$interface_friendlyname = convert_real_interface_to_friendly_interface_name($altqstats['interface']);
+	$parent_name = $parent_name . " queuerow" . $altqstats['name'] . $interface_friendlyname;
 	$prev_if = $altqstats['interface'];
-	if (!is_array($altqstats['interfacestats'])) {
+	if (empty($interface_friendlyname) || !is_array($altqstats['interfacestats'])) {
 		print("<tr><td>");
 		print("No Queue data available");
 		print("</td></tr>");
