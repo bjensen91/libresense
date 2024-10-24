@@ -82,7 +82,7 @@ export PRODUCT_SRC=${PRODUCT_SRC:-"${BUILDER_ROOT}/src"}
 export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"coreteam@libresense.org"}
 export XML_ROOTOBJ=${XML_ROOTOBJ:-$(echo "${PRODUCT_NAME}" | tr '[[:upper:]]' '[[:lower:]]')}
 
-if [ "${PRODUCT_NAME}" = "libresense" -a "${BUILD_AUTHORIZED_BY_OpenSourceCompany}" != "yes" ]; then
+if [ "${PRODUCT_NAME}" = "othersense" -a "${BUILD_AUTHORIZED_BY_OpenSourceCompany}" != "yes" ]; then
 	echo ">>>ERROR: According the following license, only OpenSourceCompany can build genuine libresense® software"
 	echo ""
 	cat ${BUILDER_ROOT}/LICENSE
