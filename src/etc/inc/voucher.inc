@@ -2,10 +2,10 @@
 /*
  * voucher.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2007-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2007 Marcel Wiget <mwiget@mac.com>
  * All rights reserved.
  *
@@ -188,7 +188,7 @@ function voucher_expire($voucher_received, $carp_loop = false) {
 	// XMLRPC Call over to the other node
 	if (captiveportal_xmlrpc_sync_get_details($syncip, $syncport,
 	    $syncuser, $syncpass, $carp_loop)) {
-		$rpc_client = new pfsense_xmlrpc_client();
+		$rpc_client = new libresense_xmlrpc_client();
 		$rpc_client->setConnectionData($syncip, $syncport, $syncuser, $syncpass);
 		$rpc_client->set_noticefile("CaptivePortalVouchersSync");
 		$arguments = array(
@@ -364,7 +364,7 @@ function voucher_auth($voucher_received, $test = 0, $carp_loop = false) {
 	// XMLRPC Call over to the other node
 	if (captiveportal_xmlrpc_sync_get_details($syncip, $syncport,
 	    $syncuser, $syncpass, $carp_loop)) {
-		$rpc_client = new pfsense_xmlrpc_client();
+		$rpc_client = new libresense_xmlrpc_client();
 		$rpc_client->setConnectionData($syncip, $syncport, $syncuser, $syncpass);
 		$rpc_client->set_noticefile("CaptivePortalVouchersSync");
 		$arguments = array(

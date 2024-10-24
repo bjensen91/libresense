@@ -2,10 +2,10 @@
 /*
  * diag_dns.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@
 
 $pgtitle = array(gettext("Diagnostics"), gettext("DNS Lookup"));
 require_once("guiconfig.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 $host = idn_to_ascii(trim($_REQUEST['host'], " \t\n\r\0\x0B[];\"'"));
 

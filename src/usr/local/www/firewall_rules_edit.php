@@ -2,10 +2,10 @@
 /*
  * firewall_rules_edit.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -810,7 +810,7 @@ if ($_POST['save']) {
 		if (empty($outoftcpflags) && !empty($settcpflags)) {
 			$input_errors[] = gettext("If TCP flags that should be set is specified, then out of which flags should be specified as well.");
 		} else {
-			/* https://redmine.pfsense.org/issues/11762 */
+			/* https://redmine.libresense.org/issues/11762 */
 			foreach ($settcpflags as $tcpflag) {
 				if (!in_array($tcpflag, $outoftcpflags)) {
 					$input_errors[] = sprintf(gettext("The TCP flag %s must be checked in 'out of' list."), strtoupper($tcpflag));
@@ -853,7 +853,7 @@ if ($_POST['save']) {
 	}
 
 	// Allow extending of the firewall edit page and include custom input validation
-	pfSense_handle_custom_code("/usr/local/pkg/firewall_rules/input_validation");
+	libresense_handle_custom_code("/usr/local/pkg/firewall_rules/input_validation");
 
 	if (!$input_errors) {
 		$filterent = array();
@@ -1048,7 +1048,7 @@ if ($_POST['save']) {
 		$filterent['updated'] = make_config_revision_entry();
 
 		// Allow extending of the firewall edit page and include custom input validation
-		pfSense_handle_custom_code("/usr/local/pkg/firewall_rules/pre_write_config");
+		libresense_handle_custom_code("/usr/local/pkg/firewall_rules/pre_write_config");
 
 		if (isset($id) && $a_filter[$id]) {
 			$tmpif = $filterent['interface'];
@@ -1215,7 +1215,7 @@ $form->addGlobal(new Form_Input(
 ));
 
 // Allow extending of the firewall edit page and include custom input validation
-pfSense_handle_custom_code("/usr/local/pkg/firewall_rules/htmlphpearly");
+libresense_handle_custom_code("/usr/local/pkg/firewall_rules/htmlphpearly");
 
 $values = array(
 	'pass' => gettext('Pass'),

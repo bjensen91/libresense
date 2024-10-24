@@ -2,10 +2,10 @@
 /*
  * interfaces.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -40,7 +40,7 @@ function interfaces_bring_up($interface) {
 		log_error("Backtrace: " . debug_backtrace());
 		return;
 	}
-	pfSense_interface_flags($interface, IFF_UP);
+	libresense_interface_flags($interface, IFF_UP);
 }
 
 /*
@@ -72,7 +72,7 @@ function get_interface_arr($flush = false) {
 
 	/* If the cache doesn't exist, build it */
 	if (!isset($interface_arr_cache) or $flush) {
-		$interface_arr_cache = pfSense_interface_listget();
+		$interface_arr_cache = libresense_interface_listget();
 	}
 
 	return $interface_arr_cache;
@@ -120,7 +120,7 @@ function does_vip_exist($vip) {
 			return false;
 	}
 
-	$ifacedata = pfSense_getall_interface_addresses($realif);
+	$ifacedata = libresense_getall_interface_addresses($realif);
 
 	if (is_subnetv6("{$vip['subnet']}/{$vip['subnet_bits']}")) {
 		$comparevip = text_to_compressed_ip6($vip['subnet']);
@@ -146,7 +146,7 @@ function interfaces_loopback_configure() {
 		echo gettext("Configuring loopback interface...");
 		mute_kernel_msgs();
 	}
-	pfSense_interface_setaddress("lo0", "127.0.0.1");
+	libresense_interface_setaddress("lo0", "127.0.0.1");
 	interfaces_bring_up("lo0");
 	if (platform_booting()) {
 		unmute_kernel_msgs();
@@ -356,7 +356,7 @@ function interfaces_vlan_configure($parentif = "") {
 				continue;
 			}
 			/* configure dhcp6 enabled VLAN interfaces later
-			 * see https://redmine.pfsense.org/issues/3965 */
+			 * see https://redmine.libresense.org/issues/3965 */
 			$if = convert_real_interface_to_friendly_interface_name($vlan['vlanif']);
 			if (config_get_path("interfaces/{$if}/ipaddrv6", "") == "dhcp6") {
 				$dhcp6c_list[$if] = $vlan;
@@ -399,17 +399,17 @@ function interface_vlan_configure(&$vlan, $flush = true) {
 	/* make sure the parent interface is up */
 	interfaces_bring_up($if);
 	/* Since we are going to add vlan(4) try to enable all that hardware supports. */
-	pfSense_interface_capabilities($if, IFCAP_VLAN_HWTAGGING|IFCAP_VLAN_MTU|IFCAP_VLAN_HWFILTER);
+	libresense_interface_capabilities($if, IFCAP_VLAN_HWTAGGING|IFCAP_VLAN_MTU|IFCAP_VLAN_HWFILTER);
 
 	if (!empty($vlanif) && does_interface_exist($vlanif)) {
-		pfSense_interface_destroy($vlanif);
+		libresense_interface_destroy($vlanif);
 	}
 
-	$tmpvlanif = pfSense_interface_create2("vlan");
-	pfSense_interface_rename($tmpvlanif, $vlanif);
-	pfSense_ngctl_name("{$tmpvlanif}:", $vlanif);
+	$tmpvlanif = libresense_interface_create2("vlan");
+	libresense_interface_rename($tmpvlanif, $vlanif);
+	libresense_ngctl_name("{$tmpvlanif}:", $vlanif);
 
-	pfSense_vlan_create($vlanif, $if, $tag, $pcp);
+	libresense_vlan_create($vlanif, $if, $tag, $pcp);
 
 	interfaces_bring_up($vlanif);
 
@@ -438,7 +438,7 @@ function interface_vlan_configure(&$vlan, $flush = true) {
 
 /*
  * reconfigure VLAN childs interfaces after MTU changes, see
- * https://redmine.pfsense.org/issues/11035
+ * https://redmine.libresense.org/issues/11035
  */
 function interfaces_vlan_configure_mtu($parentif = "") {
 	init_config_arr(array('ppps', 'ppp'));
@@ -698,13 +698,13 @@ function interface_bridge_configure(&$bridge, $checkmember = 0, $flush = true) {
 	}
 
 	if (!empty($bridge['bridgeif'])) {
-		pfSense_interface_destroy($bridge['bridgeif']);
-		pfSense_interface_create2($bridge['bridgeif']);
+		libresense_interface_destroy($bridge['bridgeif']);
+		libresense_interface_create2($bridge['bridgeif']);
 		$bridgeif = escapeshellarg($bridge['bridgeif']);
 	} else {
 		// if called directly, as interfaces_bridge_edit.php does, and bridgeif isn't set
 		// normally set by interfaces_bridge_configure, but not upon creation of new bridge
-		$bridgeif = pfSense_interface_create2("bridge");
+		$bridgeif = libresense_interface_create2("bridge");
 		$bridge['bridgeif'] = $bridgeif;
 	}
 
@@ -726,10 +726,10 @@ function interface_bridge_configure(&$bridge, $checkmember = 0, $flush = true) {
 			continue;
 		}
 		/* make sure the parent interface is up */
-		pfSense_interface_mtu($realif, $smallermtu);
+		libresense_interface_mtu($realif, $smallermtu);
 		interfaces_bring_up($realif);
 		enable_hardware_offloading($member);
-		pfSense_bridge_add_member($bridge['bridgeif'], $realif);
+		libresense_bridge_add_member($bridge['bridgeif'], $realif);
 	}
 
 	if (isset($bridge['enablestp'])) {
@@ -900,16 +900,16 @@ function interface_bridge_add_member($bridgeif, $interface, $flagsapplied = fals
 		/* Reconfigure the bridge mtu if the new member's MTU is lower, or
 		 * reconfigure a non-gif interface MTU if the bridge's MTU is lower */
 		if ($mtu > $mtum) {
-			pfSense_interface_mtu($bridgeif, $mtum);
+			libresense_interface_mtu($bridgeif, $mtum);
 		} else if ($mtu < $mtum && !(substr($interface, 0, 3) == "gif" && $mtu <= 1500)) {
-			pfSense_interface_mtu($interface, $mtu);
+			libresense_interface_mtu($interface, $mtu);
 		}
 
 		hardware_offloading_applyflags($interface);
 		interfaces_bring_up($interface);
 	}
 
-	pfSense_bridge_add_member($bridgeif, $interface);
+	libresense_bridge_add_member($bridgeif, $interface);
 	$bridged = config_get_path('bridges/bridged');
 	if (is_array($bridged)) {
 		foreach ($bridged as $bridge) {
@@ -958,11 +958,11 @@ function interface_lagg_configure($lagg, $flush = true) {
 	}
 
 	if (platform_booting() || !(empty($lagg['laggif']))) {
-		pfSense_interface_destroy($lagg['laggif']);
-		pfSense_interface_create2($lagg['laggif']);
+		libresense_interface_destroy($lagg['laggif']);
+		libresense_interface_create2($lagg['laggif']);
 		$laggif = $lagg['laggif'];
 	} else {
-		$laggif = pfSense_interface_create2("lagg");
+		$laggif = libresense_interface_create2("lagg");
 	}
 
 	/* Check if MTU was defined for this lagg interface */
@@ -1009,7 +1009,7 @@ function interface_lagg_configure($lagg, $flush = true) {
 		}
 
 		/* make sure the parent interface is up */
-		pfSense_interface_mtu($member, $lagg_mtu);
+		libresense_interface_mtu($member, $lagg_mtu);
 		interfaces_bring_up($member);
 		hardware_offloading_applyflags($member);
 
@@ -1055,11 +1055,11 @@ function interface_gre_configure(&$gre, $grekey = "", $flush = true) {
 	interfaces_bring_up($realif);
 
 	if (platform_booting() || !(empty($gre['greif']))) {
-		pfSense_interface_destroy($gre['greif']);
-		pfSense_interface_create2($gre['greif']);
+		libresense_interface_destroy($gre['greif']);
+		libresense_interface_create2($gre['greif']);
 		$greif = $gre['greif'];
 	} else {
-		$greif = pfSense_interface_create2("gre");
+		$greif = libresense_interface_create2("gre");
 	}
 
 	$tunnel_type = '';
@@ -1218,11 +1218,11 @@ function interface_gif_configure(&$gif, $gifkey = "", $flush = true) {
 	}
 
 	if (platform_booting() || !(empty($gif['gifif']))) {
-		pfSense_interface_destroy($gif['gifif']);
-		pfSense_interface_create2($gif['gifif']);
+		libresense_interface_destroy($gif['gifif']);
+		libresense_interface_create2($gif['gifif']);
 		$gifif = $gif['gifif'];
 	} else {
-		$gifif = pfSense_interface_create2("gif");
+		$gifif = libresense_interface_create2("gif");
 	}
 
 	/* Do not change the order here for more see gif(4) NOTES section. */
@@ -1239,10 +1239,10 @@ function interface_gif_configure(&$gif, $gifkey = "", $flush = true) {
 		mwexec("/sbin/ifconfig " . escapeshellarg($gifif) . " " . escapeshellarg($gif['tunnel-local-addr']) . " " . escapeshellarg($gif['tunnel-remote-addr']) . " netmask " . gen_subnet_mask($gif['tunnel-remote-net']));
 	}
 	if (isset($gif['link1'])) {
-		pfSense_interface_flags($gifif, IFF_LINK1);
+		libresense_interface_flags($gifif, IFF_LINK1);
 	}
 	if (isset($gif['link2'])) {
-		pfSense_interface_flags($gifif, IFF_LINK2);
+		libresense_interface_flags($gifif, IFF_LINK2);
 	}
 	if ($gifif) {
 		interfaces_bring_up($gifif);
@@ -1510,7 +1510,7 @@ function interface_ipsec_vti_configure($ph1ent, $gateways_status = false) {
 			}
 		}
 		/* Check/set the MTU if the user configured a custom value.
-		 * https://redmine.pfsense.org/issues/9111 */
+		 * https://redmine.libresense.org/issues/9111 */
 		$currentvtimtu = get_interface_mtu($ipsecif);
 		foreach (config_get_path('interfaces', []) as $tmpinterface) {
 			if ($tmpinterface['if'] == $ipsecif) {
@@ -1597,8 +1597,8 @@ function interfaces_configure() {
 			$track6_list[$if] = $ifname;
 		} else {
 			/* do not run dhcp6c if track interface does not exists
-			 * see https://redmine.pfsense.org/issues/3965
-			 * and https://redmine.pfsense.org/issues/11633 */
+			 * see https://redmine.libresense.org/issues/3965
+			 * and https://redmine.libresense.org/issues/11633 */
 			if ($ipaddrv6 == "dhcp6") {
 				$tr6list = link_interface_to_track6($if);
 				if (is_array($tr6list) && !empty($tr6list)) {
@@ -1760,7 +1760,7 @@ function interface_vip_bring_down($vip) {
 				if (is_ipaddrv6($vip['subnet'])) {
 					mwexec("/sbin/ifconfig {$vipif} inet6 " . escapeshellarg($vip['subnet']) . " -alias");
 				} else {
-					pfSense_interface_deladdress($vipif, $vip['subnet']);
+					libresense_interface_deladdress($vipif, $vip['subnet']);
 				}
 			}
 			break;
@@ -1770,7 +1770,7 @@ function interface_vip_bring_down($vip) {
 				if (is_ipaddrv6($vip['subnet'])) {
 					mwexec("/sbin/ifconfig {$vipif} inet6 " . escapeshellarg($vip['subnet']) . " delete");
 				} else {
-					pfSense_interface_deladdress($vipif, $vip['subnet']);
+					libresense_interface_deladdress($vipif, $vip['subnet']);
 				}
 			}
 			break;
@@ -1819,7 +1819,7 @@ function interface_bring_down($interface = "wan", $destroy = false, $ifacecfg = 
 	}
 
 	/* check all gateways, including dynamic,
-	 * see https://redmine.pfsense.org/issues/12920 */
+	 * see https://redmine.libresense.org/issues/12920 */
 	foreach (return_gateways_array(true) as $gw) {
 		if ($gw['friendlyiface'] == $interface) {
 			$restart_gateways_monitor = true;
@@ -1856,7 +1856,7 @@ function interface_bring_down($interface = "wan", $destroy = false, $ifacecfg = 
 				mwexec("/sbin/ifconfig " . escapeshellarg($realif) . " delete", true);
 				interface_vip_cleanup($interface, "inet4");
 				if ($destroy == true) {
-					pfSense_interface_flags($realif, -IFF_UP);
+					libresense_interface_flags($realif, -IFF_UP);
 				}
 				mwexec("/usr/sbin/arp -d -i " . escapeshellarg($realif) . " -a");
 			}
@@ -1866,7 +1866,7 @@ function interface_bring_down($interface = "wan", $destroy = false, $ifacecfg = 
 				mwexec("/sbin/ifconfig " . escapeshellarg($realif) . " delete", true);
 				interface_vip_cleanup($interface, "inet4");
 				if ($destroy == true) {
-					pfSense_interface_flags($realif, -IFF_UP);
+					libresense_interface_flags($realif, -IFF_UP);
 				}
 				mwexec("/usr/sbin/arp -d -i " . escapeshellarg($realif) . " -a");
 			}
@@ -1886,7 +1886,7 @@ function interface_bring_down($interface = "wan", $destroy = false, $ifacecfg = 
 				}
 				interface_vip_cleanup($interface, "inet6");
 				if ($destroy == true) {
-					pfSense_interface_flags($realif, -IFF_UP);
+					libresense_interface_flags($realif, -IFF_UP);
 				}
 			}
 			$track6 = link_interface_to_track6($interface);
@@ -1908,7 +1908,7 @@ function interface_bring_down($interface = "wan", $destroy = false, $ifacecfg = 
 				}
 				interface_vip_cleanup($interface, "inet6");
 				if ($destroy == true) {
-					pfSense_interface_flags($realif, -IFF_UP);
+					libresense_interface_flags($realif, -IFF_UP);
 				}
 			}
 			$track6 = link_interface_to_track6($interface);
@@ -1924,7 +1924,7 @@ function interface_bring_down($interface = "wan", $destroy = false, $ifacecfg = 
 				}
 				interface_vip_cleanup($interface, "inet6");
 				if ($destroy == true) {
-					pfSense_interface_flags($realif, -IFF_UP);
+					libresense_interface_flags($realif, -IFF_UP);
 				}
 				//mwexec("/usr/sbin/arp -d -i " . escapeshellarg($realif) . " -a");
 			}
@@ -1968,7 +1968,7 @@ function interface_bring_down($interface = "wan", $destroy = false, $ifacecfg = 
 
 	if ($destroy == true) {
 		if (preg_match("/^[a-z0-9]+^tun|^ovpn|^ipsec|^gif|^gre|^lagg|^bridge|vlan|_stf$/i", $realif)) {
-			pfSense_interface_destroy($realif);
+			libresense_interface_destroy($realif);
 
 			/* Invalidate cache */
 			get_interface_arr(true);
@@ -2262,7 +2262,7 @@ function interface_ppps_configure($interface) {
 				/* configure interface */
 				if (is_ipaddr($localips[$pid])) {
 					// Manually configure interface IP/subnet
-					pfSense_interface_setaddress($port, "{$localips[$pid]}/{$subnets[$pid]}");
+					libresense_interface_setaddress($port, "{$localips[$pid]}/{$subnets[$pid]}");
 					interfaces_bring_up($port);
 				} elseif (empty($localips[$pid])) {
 					$localips[$pid] = get_interface_ip($port); // try to get the interface IP from the port
@@ -2689,7 +2689,7 @@ EOD;
 
 	/* Set temporary bogon (RFC 5737) IPv4 addresses to work round mpd5 IPv6CP issue causing */
 	/* random IPv6 interface identifier during boot. More details at */
-	/* https://forum.netgate.com/post/592474 */
+	/* https://forum.OpenSourceCompany.com/post/592474 */
 	if (platform_booting()) {
 		$count = 0;
 		foreach (config_get_path('interfaces', []) as $tempifacename => $tempiface) {
@@ -3091,8 +3091,8 @@ function interface_carp_configure(&$vip, $maintenancemode_only = false, $ipalias
 	}
 
 	/* reconfigure stacked IP Aliases after CARP VIP changes
-	 * see https://redmine.pfsense.org/issues/12227
-	 * and https://redmine.pfsense.org/issues/12961 */
+	 * see https://redmine.libresense.org/issues/12227
+	 * and https://redmine.libresense.org/issues/12961 */
 	if ($ipalias_reload) {
 		foreach (config_get_path('virtualip/vip', []) as $viface) {
 			if (($viface['mode'] == 'ipalias') &&
@@ -3151,7 +3151,7 @@ function interface_wireless_clone($realif, $wlcfg) {
 	if ($needs_clone == true) {
 		/* remove previous instance if it exists */
 		if (does_interface_exist($realif)) {
-			pfSense_interface_destroy($realif);
+			libresense_interface_destroy($realif);
 
 			/* Invalidate cache */
 			get_interface_arr(true);
@@ -3167,7 +3167,7 @@ function interface_wireless_clone($realif, $wlcfg) {
 		}
 		$newif = trim($out[0]);
 		// Rename the interface to {$parentnic}_wlan{$number}#: EX: ath0_wlan0
-		pfSense_interface_rename($newif, $realif);
+		libresense_interface_rename($newif, $realif);
 		file_put_contents("{$g['tmp_path']}/{$realif}_oldmac", get_interface_mac($realif));
 	}
 	return true;
@@ -4013,7 +4013,7 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 
 	if (!platform_booting() && (substr($realif, 0, 4) != "ovpn") && (substr($realif, 0, 5) != "ipsec")) {
 		/* remove all IPv4 and IPv6 addresses */
-		$tmpifaces = pfSense_getall_interface_addresses($realif);
+		$tmpifaces = libresense_getall_interface_addresses($realif);
 		if (is_array($tmpifaces)) {
 			foreach ($tmpifaces as $tmpiface) {
 				if (is_ipaddrv6($tmpiface) || is_subnetv6($tmpiface)) {
@@ -4029,7 +4029,7 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 					} else {
 						$tmpip = $tmpiface;
 					}
-					pfSense_interface_deladdress($realif, $tmpip);
+					libresense_interface_deladdress($realif, $tmpip);
 				}
 			}
 		}
@@ -4077,7 +4077,7 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 		 * Some network devices respond to a DHCPv6 Solicit message only when
 		 * the IPv6 source address is consistent with what they expect.
 		 *
-		 * See https://redmine.pfsense.org/issues/12794 */
+		 * See https://redmine.libresense.org/issues/12794 */
 		if ($mac_addr != $current_mac) {
 			mwexec("/sbin/ifconfig " . escapeshellarg($realif) . " inet6 ifdisabled");
 			mwexec("/sbin/ifconfig " . escapeshellarg($realif) . " inet6 " . get_interface_linklocal($interface) . " delete");
@@ -4203,7 +4203,7 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 		}
 	} else {
 		if ($wantedmtu != get_interface_mtu($mtuif)) {
-			pfSense_interface_mtu($mtuif, $wantedmtu);
+			libresense_interface_mtu($mtuif, $wantedmtu);
 			set_ipv6routes_mtu($mtuif, $wantedmtu);
 		}
 	}
@@ -4227,7 +4227,7 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 			/* XXX: Kludge for now related to #3280 */
 			if (!in_array($tunnelif, array("gif", "gre", "ovp", "ips", "l2t"))) {
 				if (is_ipaddrv4($wancfg['ipaddr']) && $wancfg['subnet'] <> "") {
-					pfSense_interface_setaddress($realif, "{$wancfg['ipaddr']}/{$wancfg['subnet']}");
+					libresense_interface_setaddress($realif, "{$wancfg['ipaddr']}/{$wancfg['subnet']}");
 				}
 			}
 			break;
@@ -4259,8 +4259,8 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 			/* XXX: Kludge for now related to #3280 */
 			if (!in_array($tunnelif, array("gif", "gre", "ovp", "ips", "l2t"))) {
 				if (is_ipaddrv6($wancfg['ipaddrv6']) && $wancfg['subnetv6'] <> "") {
-					//pfSense_interface_setaddress($realif, "{$wancfg['ipaddrv6']}/{$wancfg['subnetv6']}");
-					// FIXME: Add IPv6 Support to the pfSense module
+					//libresense_interface_setaddress($realif, "{$wancfg['ipaddrv6']}/{$wancfg['subnetv6']}");
+					// FIXME: Add IPv6 Support to the libresense module
 					mwexec("/sbin/ifconfig " . escapeshellarg($realif) . " inet6 {$wancfg['ipaddrv6']} prefixlen " . escapeshellarg($wancfg['subnetv6']));
 				}
 			}
@@ -4587,11 +4587,11 @@ function interface_6rd_configure($interface, $wancfg) {
 	/* XXX: need to extend to support variable prefix size for v4 */
 	$stfiface = "{$interface}_stf";
 	if (does_interface_exist($stfiface)) {
-		pfSense_interface_destroy($stfiface);
+		libresense_interface_destroy($stfiface);
 	}
-	$tmpstfiface = pfSense_interface_create2("stf");
-	pfSense_interface_rename($tmpstfiface, $stfiface);
-	pfSense_interface_flags($stfiface, IFF_LINK2);
+	$tmpstfiface = libresense_interface_create2("stf");
+	libresense_interface_rename($tmpstfiface, $stfiface);
+	libresense_interface_flags($stfiface, IFF_LINK2);
 	mwexec("/sbin/ifconfig {$stfiface} inet6 {$rd6prefix}/{$rd6prefixlen}");
 	mwexec("/sbin/ifconfig {$stfiface} stfv4br " . escapeshellarg($wancfg['gateway-6rd']));
 	if ($wancfg['prefix-6rd-v4plen'] >= 0 && $wancfg['prefix-6rd-v4plen'] <= 32) {
@@ -4703,11 +4703,11 @@ function interface_6to4_configure($interface, $wancfg) {
 	}
 	$stfiface = "{$interface}_stf";
 	if (does_interface_exist($stfiface)) {
-		pfSense_interface_destroy($stfiface);
+		libresense_interface_destroy($stfiface);
 	}
-	$tmpstfiface = pfSense_interface_create2("stf");
-	pfSense_interface_rename($tmpstfiface, $stfiface);
-	pfSense_interface_flags($stfiface, IFF_LINK2);
+	$tmpstfiface = libresense_interface_create2("stf");
+	libresense_interface_rename($tmpstfiface, $stfiface);
+	libresense_interface_flags($stfiface, IFF_LINK2);
 	mwexec("/sbin/ifconfig {$stfiface} inet6 {$stflanpr} prefixlen 16");
 
 	$parentmtu = get_interface_mtu(get_real_interface($interface));
@@ -5355,7 +5355,7 @@ interface "{$realif}" {
 	initial-interval 1;
 	{$dhclientconf_vlantag}
 	{$dhclientconf_hostname}
-	script "/usr/local/sbin/pfSense-dhclient-script";
+	script "/usr/local/sbin/libresense-dhclient-script";
 EOD;
 
 	if (validate_ipv4_list($ifcfg['dhcprejectfrom'])) {
@@ -5473,7 +5473,7 @@ function DHCP_Config_File_Advanced($ifcfg, $realif) {
 	if (is_ipaddrv4($ifcfg['dhcprejectfrom'])) {
 		$dhclientconf .= "reject {$ifcfg['dhcprejectfrom']};\n";
 	}
-	$dhclientconf .= "\tscript \"/usr/local/sbin/pfSense-dhclient-script\";\n";
+	$dhclientconf .= "\tscript \"/usr/local/sbin/libresense-dhclient-script\";\n";
 	$dhclientconf .= "}\n";
 
 	$dhclientconf = DHCP_Config_File_Substitutions($ifcfg, $realif, $dhclientconf);
@@ -6277,7 +6277,7 @@ function find_interface_ip($interface, $flush = false) {
 	if (!isset($interface_ip_arr_cache[$interface]) or $flush) {
 		if (file_exists("/var/db/${interface}_ip")) {
 			$ifip = chop(file_get_contents("/var/db/${interface}_ip"));
-			$ifaddrs = pfSense_getall_interface_addresses($interface);
+			$ifaddrs = libresense_getall_interface_addresses($interface);
 			foreach ($ifaddrs as $ifaddr) {
 				list($ip, $mask) = explode("/", $ifaddr);
 				if ($ip == $ifip) {
@@ -6335,7 +6335,7 @@ function find_interface_ipv6_ll($interface, $flush = false, $usefirst = true) {
 
 	/* Setup IP cache */
 	if (!isset($interface_llv6_arr_cache[$interface]) or $flush) {
-		$ifinfo = pfSense_getall_interface_addresses($interface);
+		$ifinfo = libresense_getall_interface_addresses($interface);
 		foreach ($ifinfo as $line) {
 			if (strstr($line, ":")) {
 				$parts = explode("/", $line);
@@ -6537,7 +6537,7 @@ function get_interface_ipv6($interface = "wan", $flush = false, $linklocal_fallb
 		}
 	}
 
-	/* try to find track6 address, see https://redmine.pfsense.org/issues/5999 */
+	/* try to find track6 address, see https://redmine.libresense.org/issues/5999 */
 	$checkif = is_array($iface) ? $interface : convert_real_interface_to_friendly_interface_name($interface);
 	if (config_get_path("interfaces/{$checkif}/ipaddrv6", "") == 'track6') {
 		$curip = get_interface_track6ip($checkif);
@@ -6595,7 +6595,7 @@ function get_interface_track6ip($interface = "wan") {
 	$realif = get_real_interface($interface);
 	$vips = get_configured_vip_list('inet6');
 
-	foreach (pfSense_getall_interface_addresses($realif) as $ifaddr) {
+	foreach (libresense_getall_interface_addresses($realif) as $ifaddr) {
 		list($ip, $bits) = explode("/", $ifaddr);
 		$ip = text_to_compressed_ip6($ip);
 		if (is_ipaddrv6($ip) && !is_linklocal($ip)) {
@@ -6652,7 +6652,7 @@ function get_interface_subnetv6($interface = "wan") {
 		return (NULL);
 	}
 
-	/* try to find track6 address, see https://redmine.pfsense.org/issues/5999 */
+	/* try to find track6 address, see https://redmine.libresense.org/issues/5999 */
 	if (config_get_path("interfaces/{$interface}/ipaddrv6") == 'track6') {
 		$curip = get_interface_track6ip($interface);
 		if ($curip) {
@@ -6704,7 +6704,7 @@ function interface_has_gateway($friendly) {
 	if (!empty($ifname)) {
 		switch ($ifname['ipaddr']) {
 			case "dhcp":
-				/* see https://redmine.pfsense.org/issues/5135 */
+				/* see https://redmine.libresense.org/issues/5135 */
 				if (get_interface_gateway($friendly)) {
 					return true;
 				}
@@ -6978,7 +6978,7 @@ function set_interface_mtu($interface, $mtu) {
 			}
 		}
 	} else {
-		pfSense_interface_mtu($interface, $mtu);
+		libresense_interface_mtu($interface, $mtu);
 		set_ipv6routes_mtu($interface, $mtu);
 	}
 }
@@ -6990,7 +6990,7 @@ function set_interface_mtu($interface, $mtu) {
  *   $tmp       - Returns the mtu of an interface
  ******/
 function get_interface_mtu($interface) {
-	$mtu = pfSense_interface_getmtu($interface);
+	$mtu = libresense_interface_getmtu($interface);
 	return $mtu['mtu'];
 }
 
@@ -7022,7 +7022,7 @@ function get_interface_vendor_mac($interface) {
 	return (NULL);
 }
 
-/****f* pfsense-utils/generate_random_mac_address
+/****f* libresense-utils/generate_random_mac_address
  * NAME
  *   generate_random_mac - generates a random mac address
  * INPUTS
@@ -7417,7 +7417,7 @@ function restart_interface_services($interface, $ipv6type = "") {
 	ipsec_force_reload($interface);
 
 	/* restart RADVD to announce correct IPv6 prefix
-	 * see https://redmine.pfsense.org/issues/12604 */
+	 * see https://redmine.libresense.org/issues/12604 */
 	if ((is_ipaddrv6($ipv6type) || ($ipv6type == "track6")) &&
 	    (config_get_path("dhcpdv6/{$interface}/ramode", "disabled") != "disabled")) {
 		services_radvd_configure();
@@ -7436,7 +7436,7 @@ function restart_interface_services($interface, $ipv6type = "") {
 
 /**
  * Return interface parameters and primary ipv4 and ipv6 addresses for the real iface
- * $interface, identified by exclusion of VIPs. Deprecates pfSense_get_interface_addresses()
+ * $interface, identified by exclusion of VIPs. Deprecates libresense_get_interface_addresses()
  *
  * Result array contains keyed values:
  * - ipaddr: ipv4 address
@@ -7473,7 +7473,7 @@ function get_interface_addresses($interface) {
 	$v6addrs = array();
 	$v4vips = array();
 	$v6vips = array();
-	$ifaddrs = pfSense_get_ifaddrs($interface);
+	$ifaddrs = libresense_get_ifaddrs($interface);
 
 	foreach (array_keys(get_configured_vip_list()) as $viface) {
 		$vip = get_configured_vip($viface);
@@ -7495,7 +7495,7 @@ function get_interface_addresses($interface) {
 			return (array_search(Net_IPv6::Uncompress($addr['addr']), $v6vips) === false);
 		});
 	}
-	/* Transform output to conform to pfSense_get_interface_addresses() */
+	/* Transform output to conform to libresense_get_interface_addresses() */
 	if ($v4addrs) {
 		$v4addr = array_shift($v4addrs);
 		$ifaddrs['ipaddr'] = $v4addr['addr'];

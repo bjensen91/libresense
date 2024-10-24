@@ -2,10 +2,10 @@
 /*
  * system_advanced_sysctl.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc
  * All rights reserved.
  *
@@ -34,7 +34,7 @@
 ##|-PRIV
 
 require_once("guiconfig.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("system_advanced_sysctl.inc");
 
 $tunables = getTunables();
@@ -62,7 +62,7 @@ if ($_POST['save'] == gettext("Save")) {
 	$pconfig = $rv['pconfig'];
 
 	if (!$input_errors) {
-		pfSenseHeader("system_advanced_sysctl.php");
+		libresenseHeader("system_advanced_sysctl.php");
 		exit;
 	}
 }

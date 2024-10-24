@@ -2,10 +2,10 @@
 /*
  * firewall_rules.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -341,7 +341,7 @@ if (isset($_POST['del_x'])) {
 	$confiflist = get_configured_interface_list();
 	/* Use this as a starting point and increase as we go, otherwise if the
 	 * loop runs fast there can be duplicates.
-	 * https://redmine.pfsense.org/issues/13507 */
+	 * https://redmine.libresense.org/issues/13507 */
 	$tracker = (int)microtime(true);
 	foreach ($_POST['rule'] as $rulei) {
 		$filterent = $a_filter[$rulei];
@@ -435,13 +435,13 @@ if (isset($config['system']['webgui']['roworderdragging'])) {
 }
 
 /* Load the counter data of each pf rule. */
-$rulescnt = pfSense_get_pf_rules();
+$rulescnt = libresense_get_pf_rules();
 
 // Update this if you add or remove columns!
 $columns_in_table = 13;
 
 /* Floating rules tab has one extra column
- * https://redmine.pfsense.org/issues/10667 */
+ * https://redmine.libresense.org/issues/10667 */
 if ($if == "FloatingRules") {
 	$columns_in_table++;
 }
@@ -568,7 +568,7 @@ $separators = config_get_path('filter/separator/'.strtolower($if));
 $seprows = separator_rows($separators);
 
 /* Cache gateway status for this page load.
- * See https://redmine.pfsense.org/issues/12174 */
+ * See https://redmine.libresense.org/issues/12174 */
 $gateways_status = return_gateways_status(true);
 
 foreach ($a_filter as $filteri => $filterent):
@@ -922,7 +922,7 @@ foreach ($a_filter as $filteri => $filterent):
 							<?php if (isset($filterent['gateway'])): ?>
 								<?php
 									/* Cache gateway status for this page load.
-									 * See https://redmine.pfsense.org/issues/12174 */
+									 * See https://redmine.libresense.org/issues/12174 */
 									if (!is_array($gw_info)) {
 										$gw_info = array();
 									}
@@ -1148,7 +1148,7 @@ else: ?>
 <script type="text/javascript">
 //<![CDATA[
 
-//Need to create some variables here so that jquery/pfSenseHelpers.js can read them
+//Need to create some variables here so that jquery/libresenseHelpers.js can read them
 iface = "<?=strtolower($if)?>";
 cncltxt = '<?=gettext("Cancel")?>';
 svtxt = '<?=gettext("Save")?>';

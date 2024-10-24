@@ -1,5 +1,5 @@
 {
-    "name": "pfsense/pfsense",
+    "name": "libresense/libresense",
     "require": {
         "mikehaertl/php-shellcommand": "^1.6",
         "symfony/cache": "^5.3",
@@ -9,14 +9,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Netgate\\": "//usr/local/pfSense/include/Netgate/",
-            "pfSense\\": "//usr/local/pfSense/include/",
+            "OpenSourceCompany\\": "//usr/local/libresense/include/OpenSourceCompany/",
+            "libresense\\": "//usr/local/libresense/include/",
 	    "Tools\\Rector\\": "tools/rector/src",
 	    "Tools\\Rector\\Tests\\": "tools/rector/tests"
         }
     },
     "config": {
-        "vendor-dir": "src/usr/local/pfSense/include/vendor",
+        "vendor-dir": "src/usr/local/libresense/include/vendor",
         "optimize-autoloader": true
     },
     "require-dev": {

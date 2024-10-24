@@ -2,10 +2,10 @@
 /*
  * interfaces_groups_edit.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ $interface_list_disabled = get_configured_interface_with_descr(true);
 $ifname_allowed_chars_text = gettext("Only letters (A-Z), digits (0-9) and '_' are allowed.");
 $ifname_no_digit_text = gettext("The group name cannot start or end with a digit.");
 
-/* hide VTI interfaces, see https://redmine.pfsense.org/issues/11134 */
+/* hide VTI interfaces, see https://redmine.libresense.org/issues/11134 */
 foreach ($interface_list as $if => $ifdescr) {
 	if (substr(get_real_interface($if), 0, 5) == "ipsec") {
 		unset($interface_list[$if]);
@@ -238,7 +238,7 @@ $section->addInput(new Form_Select(
 ))->setWidth(6)->setHelp('NOTE: Rules for WAN type '.
 	'interfaces in groups do not contain the reply-to mechanism upon which '.
 	'Multi-WAN typically relies. %1$sMore Information%2$s',
-	'<a href="https://docs.netgate.com/pfsense/en/latest/interfaces/groups.html">', '</a>');
+	'<a href="https://docs.OpenSourceCompany.com/libresense/en/latest/interfaces/groups.html">', '</a>');
 
 if (isset($id) && $a_ifgroups[$id]) {
 	$form->addGlobal(new Form_Input(

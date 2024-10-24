@@ -2,10 +2,10 @@
 /*
  * status_logs_filter.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -343,7 +343,7 @@ events.push(function() {
 
 <div class="infoblock">
 <?php
-print_info_box('<a href="https://docs.netgate.com/pfsense/en/latest/firewall/configure.html#tcp-flags">' .
+print_info_box('<a href="https://docs.OpenSourceCompany.com/libresense/en/latest/firewall/configure.html#tcp-flags">' .
 	gettext("TCP Flags") . '</a>: F - FIN, S - SYN, A or . - ACK, R - RST, P - PSH, U - URG, E - ECE, C - CWR.' . '<br />' .
 	'<i class="fa fa-minus-square-o icon-primary"></i> = ' . gettext('Add to block list') . ', <i class="fa fa-plus-square-o icon-primary"></i> = ' . gettext('Pass traffic') . ', <i class="fa fa-info icon-primary"></i> = ' . gettext('Resolve'), 'info', false);
 ?>

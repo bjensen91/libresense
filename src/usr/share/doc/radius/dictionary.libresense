@@ -1,0 +1,18 @@
+# -*- text -*-
+##############################################################################
+#
+#	libresense Captive Portal
+#
+#	$Id$
+#
+##############################################################################
+
+VENDOR		libresense				13644
+
+BEGIN-VENDOR	libresense
+
+ATTRIBUTE	libresense-Bandwidth-Max-Up		1	integer
+ATTRIBUTE	libresense-Bandwidth-Max-Down		2	integer
+ATTRIBUTE	libresense-Max-Total-Octets		3	integer
+
+END-VENDOR	libresense

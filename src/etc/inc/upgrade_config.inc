@@ -2,10 +2,10 @@
 /*
  * upgrade_config.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@ if (!function_exists("read_altq_config")) {
 	require_once("shaper.inc");
 }
 if (!function_exists("console_configure")) {
-	require_once("/etc/inc/pfsense-utils.inc");
+	require_once("/etc/inc/libresense-utils.inc");
 }
 if (!function_exists("get_specialnet")) {
 	require_once("/etc/inc/util.inc");
@@ -2404,7 +2404,7 @@ function upgrade_061_to_062() {
 }
 
 function upgrade_062_to_063() {
-	/* Upgrade legacy Themes to the new pfsense_ng */
+	/* Upgrade legacy Themes to the new libresense_ng */
 	// Not supported in 2.3+
 
 }
@@ -3438,7 +3438,7 @@ function upgrade_104_to_105() {
 
 function upgrade_105_to_106() {
 	/* NOTE: This upgrade code was reverted. See redmine ticket #3967 and
-	   https://github.com/pfsense/pfsense/commit/6f55af1c25f5232ffe905a90f5f97aad4c87bdfa */
+	   https://github.com/libresense/libresense/commit/6f55af1c25f5232ffe905a90f5f97aad4c87bdfa */
 }
 
 function upgrade_106_to_107() {
@@ -4915,7 +4915,7 @@ function upgrade_152_to_153() {
 
 function upgrade_153_to_154() {
 	/* NOTE: This upgrade code was reverted. See redmine ticket #6118 and
-	   https://github.com/pfsense/pfsense/commit/538a3c04a6b6671151e913b06b2f340b6f8ee222 */
+	   https://github.com/libresense/libresense/commit/538a3c04a6b6671151e913b06b2f340b6f8ee222 */
 }
 
 /* Clean up old GRE/GIF options. See Redmine tickets #6586 and #6587 */
@@ -5106,7 +5106,7 @@ function upgrade_160_to_161() {
 	}
 }
 
-/* Previous versions of pfSense had cryptodev built into the kernel.
+/* Previous versions of libresense had cryptodev built into the kernel.
  * To retain the expected behavior on upgrade, load the cryptodev
  * module for users that did not choose a module.
  */
@@ -5253,7 +5253,7 @@ function upgrade_163_to_164() {
 	convert_widget_164('wol', 'wake_on_lan-0', array('filter' => ''));
 }
 
-/* Work around broken wizard rules. See https://redmine.pfsense.org/issues/7434 */
+/* Work around broken wizard rules. See https://redmine.libresense.org/issues/7434 */
 function upgrade_164_to_165() {
 	global $config;
 	foreach ($config['filter']['rule'] as & $rule) {
@@ -5282,13 +5282,13 @@ function upgrade_165_to_166() {
 	}
 }
 
-/* Force the Netgate Services and Support widget to be active on upgrade.
+/* Force the OpenSourceCompany Services and Support widget to be active on upgrade.
    New widget is added at the top of column 2 */
 function upgrade_166_to_167() {
 	global $config;
 
 	if (strpos($config['widgets']['sequence'],
-	    'netgate_services_and_support') === false) {
+	    'OpenSourceCompany_services_and_support') === false) {
 		$widgets = explode(",", $config['widgets']['sequence']);
 		$cnt = count($widgets);
 		$col2 = $cnt;
@@ -5314,7 +5314,7 @@ function upgrade_166_to_167() {
 			}
 			$new++;
 			$newsequence[$new] =
-			    "netgate_services_and_support:col2:open:0";
+			    "OpenSourceCompany_services_and_support:col2:open:0";
 		}
 
 		$config['widgets']['sequence'] = implode(",", $newsequence);
@@ -5358,7 +5358,7 @@ function upgrade_168_to_169() {
 
 /* Upgrade wireless interfaces to the format required for 2.4
  * Each wireless interface now needs to be a cloned instance, the card itself
- * Can no longer be assigned. https://redmine.pfsense.org/issues/6770 */
+ * Can no longer be assigned. https://redmine.libresense.org/issues/6770 */
 function upgrade_169_to_170() {
 	global $config;
 	foreach ($config['interfaces'] as $friendly => & $iface) {
@@ -5707,7 +5707,7 @@ function upgrade_181_to_182() {
 }
 
 /* Correct gateway group trigger level values.
- * See https://redmine.pfsense.org/issues/8586
+ * See https://redmine.libresense.org/issues/8586
  */
 function upgrade_182_to_183() {
 	global $config;
@@ -5935,7 +5935,7 @@ function upgrade_188_to_189() {
 		config_del_path('system/enablesshd');
 	}
 	/* Remove accidentally duplicated ssh config
-	 * See https://redmine.pfsense.org/issues/8974 */
+	 * See https://redmine.libresense.org/issues/8974 */
 	if (isset($config['system']['sshd'])) {
 		config_del_path('system/sshd');
 	}
@@ -5943,7 +5943,7 @@ function upgrade_188_to_189() {
 
 /* Older preexisting IPsec P1 entries may not have had the protocol explicitly
  * defined. Fill in the default value of 'inet'.
- * https://redmine.pfsense.org/issues/9207 */
+ * https://redmine.libresense.org/issues/9207 */
 function upgrade_189_to_190() {
 	global $config;
 	init_config_arr(array('ipsec', 'phase1'));
@@ -5958,7 +5958,7 @@ function upgrade_189_to_190() {
 }
 
 /* sshguard cron jobs are not necessary.
- * See https://redmine.pfsense.org/issues/9223 */
+ * See https://redmine.libresense.org/issues/9223 */
 function upgrade_190_to_191() {
 	global $config;
 	install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/expiretable -v -t 3600 sshguard", false, null, null, null, null, null, null, false);
@@ -5966,7 +5966,7 @@ function upgrade_190_to_191() {
 }
 
 /* Deprecate relayd Load Balancer
- * See https://redmine.pfsense.org/issues/9386 */
+ * See https://redmine.libresense.org/issues/9386 */
 function upgrade_191_to_192() {
 	global $config;
 
@@ -6042,7 +6042,7 @@ function upgrade_193_to_194() {
  * Reset all log files, including package logs, on upgrade since old logs are in
  * binary clog format.
  * Conversion is not possible since the clog binary will not be present.
- * https://redmine.pfsense.org/issues/8350
+ * https://redmine.libresense.org/issues/8350
  */
 function upgrade_194_to_195() {
 	global $g;
@@ -6058,7 +6058,7 @@ function upgrade_194_to_195() {
 	}
 }
 
-/* Skipped. See https://redmine.pfsense.org/issues/9730 */
+/* Skipped. See https://redmine.libresense.org/issues/9730 */
 function upgrade_195_to_196() {
 }
 
@@ -6079,7 +6079,7 @@ function upgrade_197_to_198() {
 }
 
 /* Update IPsec authentication method names
- * https://redmine.pfsense.org/issues/9903 */
+ * https://redmine.libresense.org/issues/9903 */
 function upgrade_198_to_199() {
 	global $config;
 	/* "RSA" methods changed to the more generic "cert" since they are not only RSA. */
@@ -6097,7 +6097,7 @@ function upgrade_198_to_199() {
 	}
 }
 
-/* Superceded. See https://redmine.pfsense.org/issues/11219 and upgrade_212_to_213() */
+/* Superceded. See https://redmine.libresense.org/issues/11219 and upgrade_212_to_213() */
 function upgrade_199_to_200() {
 	global $config;
 }
@@ -6155,7 +6155,7 @@ function upgrade_202_to_203() {
 
 /*
  * Change IPsec close_action values
- * See https://redmine.pfsense.org/issues/10632
+ * See https://redmine.libresense.org/issues/10632
  */
 
 function upgrade_203_to_204() {
@@ -6228,7 +6228,7 @@ function upgrade_207_to_208() {
 }
 
 /* Update IPsec VTI to new VTIMAP format
- * https://redmine.pfsense.org/issues/9592
+ * https://redmine.libresense.org/issues/9592
  */
 function upgrade_208_to_209() {
 	require_once("interfaces.inc");
@@ -6274,7 +6274,7 @@ function upgrade_209_to_210() {
 }
 
 /* OpenVPN Data Cipher changes
- * https://redmine.pfsense.org/issues/10919 */
+ * https://redmine.libresense.org/issues/10919 */
 function upgrade_210_to_211() {
 	global $config;
 	init_config_arr(array('openvpn', 'openvpn-server'));
@@ -6319,8 +6319,8 @@ function upgrade_211_to_212() {
 }
 
 /* IPsec Expiration and Replacement values which need updated for swanctl format
- * https://redmine.pfsense.org/issues/11219
- * https://redmine.pfsense.org/issues/9983
+ * https://redmine.libresense.org/issues/11219
+ * https://redmine.libresense.org/issues/9983
  */
 function upgrade_212_to_213() {
 	global $config;
@@ -6449,7 +6449,7 @@ function upgrade_215_to_216() {
 /*
  * Child SA Start Action has replaced the Responder Only option. Update P1
  * to match.
- * https://redmine.pfsense.org/issues/11576
+ * https://redmine.libresense.org/issues/11576
  */
 function upgrade_216_to_217() {
 	global $config;
@@ -6467,7 +6467,7 @@ function upgrade_216_to_217() {
 
 /*
  * Disable PC/SC Smart Card Daemon if PKCS#11 authentication is not used
- * https://redmine.pfsense.org/issues/11933
+ * https://redmine.libresense.org/issues/11933
  */
 function upgrade_217_to_218() {
 	global $config;
@@ -6642,7 +6642,7 @@ function upgrade_224_to_225() {
 	global $config;
 
 	/* DHCP6 now uses single config for all interfaces
-	 * see https://redmine.pfsense.org/issues/6880 */
+	 * see https://redmine.libresense.org/issues/6880 */
 	foreach ($config['interfaces'] as & $inf) {
 		if (isset($inf['dhcp6debug'])) {
 			$config['system']['dhcp6debug'] = true;
@@ -6659,7 +6659,7 @@ function upgrade_225_to_226() {
 	global $config;
 
 	/* Update value of state killing on gateway failure.
-	 * https://redmine.pfsense.org/issues/12092
+	 * https://redmine.libresense.org/issues/12092
 	 */
 	if (isset($config['system']['gw_down_kill_states'])) {
 		$config['system']['gw_down_kill_states'] = 'all';
@@ -6670,7 +6670,7 @@ function upgrade_226_to_227() {
 	global $config;
 
 	/* Convert dnsmasq (forwarder) custom options to base64.
-	 * https://redmine.pfsense.org/issues/13105
+	 * https://redmine.libresense.org/issues/13105
 	 */
 	if (is_array($config['dnsmasq']) && !empty($config['dnsmasq']['custom_options'])) {
 		$config['dnsmasq']['custom_options'] = base64_encode($config['dnsmasq']['custom_options']);
@@ -6770,7 +6770,7 @@ function upgrade_227_to_228() {
 function upgrade_228_to_229() {
 	global $g;
 	/* Update System Memory RRD file with new data sources
-	 * https://redmine.pfsense.org/issues/14011
+	 * https://redmine.libresense.org/issues/14011
 	 */
 	$rrddbpath = "/var/db/rrd/";
 	$database = "system-memory.rrd";
@@ -6868,8 +6868,8 @@ function upgrade_229_to_230() {
 /*
  * Check OpenVPN instances for deprecated algorithms and weak certificate
  * digests.
- * https://redmine.pfsense.org/issues/14677
- * https://redmine.pfsense.org/issues/14686
+ * https://redmine.libresense.org/issues/14677
+ * https://redmine.libresense.org/issues/14686
  */
 function upgrade_230_to_231() {
 	/* Load lists of current usable algorithms */
@@ -6947,7 +6947,7 @@ function upgrade_230_to_231() {
 
 /*
  * Check GUI and Captive Portal zones for certs with weak digests
- * https://redmine.pfsense.org/issues/14672
+ * https://redmine.libresense.org/issues/14672
  */
 function upgrade_231_to_232() {
 	/* Check GUI if it is set for HTTPS */
@@ -7004,7 +7004,7 @@ function upgrade_231_to_232() {
 
 /* Update language internal IDs to match OS Locales where possible
  * Some languages do not have direct equivalents.
- * https://redmine.pfsense.org/issues/13776 */
+ * https://redmine.libresense.org/issues/13776 */
 function upgrade_232_to_233() {
 	$lang_changes= [
 		"nl" => "nl_NL",
@@ -7029,7 +7029,7 @@ function upgrade_232_to_233() {
 /*
  * Special function that is called independent of current config version. It's
  * a workaround to have config_upgrade running on older versions after next
- * config version was already taken by newer pfSense.
+ * config version was already taken by newer libresense.
  *
  * XXX Change the way we handle config version to make it based on product
  *     version

@@ -2,10 +2,10 @@
 /*
  * system_usermanager.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc.
  * Copyright (c) 2005 Paul Taylor <paultaylor@winn-dixie.com>
  * All rights reserved.
@@ -37,7 +37,7 @@
 
 require_once("certs.inc");
 require_once("guiconfig.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 $logging_level = LOG_WARNING;
 $logging_prefix = gettext("Local User Database");
@@ -92,7 +92,7 @@ if (isset($id) && $a_user[$id]) {
 /*
  * Check user privileges to test if the user is allowed to make changes.
  * Otherwise users can end up in an inconsistent state where some changes are
- * performed and others denied. See https://redmine.pfsense.org/issues/9259
+ * performed and others denied. See https://redmine.libresense.org/issues/9259
  */
 phpsession_begin();
 $guiuser = getUserEntry($_SESSION['Username']);
@@ -106,7 +106,7 @@ if (!empty($_POST) && $read_only) {
 if (($_POST['act'] == "deluser") && !$read_only) {
 
 	if (!isset($_POST['username']) || !isset($a_user[$id]) || ($_POST['username'] != $a_user[$id]['name'])) {
-		pfSenseHeader("system_usermanager.php");
+		libresenseHeader("system_usermanager.php");
 		exit;
 	}
 
@@ -116,7 +116,7 @@ if (($_POST['act'] == "deluser") && !$read_only) {
 		local_user_del($a_user[$id]);
 		$userdeleted = $a_user[$id]['name'];
 		unset($a_user[$id]);
-		/* Reindex the array to avoid operating on an incorrect index https://redmine.pfsense.org/issues/7733 */
+		/* Reindex the array to avoid operating on an incorrect index https://redmine.libresense.org/issues/7733 */
 		$a_user = array_values($a_user);
 		$savemsg = sprintf(gettext("Successfully deleted user: %s"), $userdeleted);
 		write_config($savemsg);
@@ -167,7 +167,7 @@ if (isset($_POST['dellall']) && !$read_only) {
 
 		if (count($deleted_users) > 0) {
 			$savemsg = sprintf(gettext("Successfully deleted %s: %s"), (count($deleted_users) == 1) ? gettext("user") : gettext("users"), implode(', ', $deleted_users));
-			/* Reindex the array to avoid operating on an incorrect index https://redmine.pfsense.org/issues/7733 */
+			/* Reindex the array to avoid operating on an incorrect index https://redmine.libresense.org/issues/7733 */
 			$a_user = array_values($a_user);
 			write_config($savemsg);
 			syslog($logging_level, "{$logging_prefix}: {$savemsg}");
@@ -178,7 +178,7 @@ if (isset($_POST['dellall']) && !$read_only) {
 if (($_POST['act'] == "delcert") && !$read_only) {
 
 	if (!$a_user[$id]) {
-		pfSenseHeader("system_usermanager.php");
+		libresenseHeader("system_usermanager.php");
 		exit;
 	}
 
@@ -508,7 +508,7 @@ if ($_POST['save'] && !$read_only) {
 			send_event("service restart sshd");
 		}
 
-		pfSenseHeader("system_usermanager.php");
+		libresenseHeader("system_usermanager.php");
 	}
 }
 
@@ -1112,7 +1112,7 @@ events.push(function() {
 
 	// Handle displaying a warning message if a user-created theme is selected.
 	function setThemeWarning() {
-		if ($('#webguicss').val().startsWith("pfSense")) {
+		if ($('#webguicss').val().startsWith("libresense")) {
 			$('#csstxt').html("").addClass("text-default");
 		} else {
 			$('#csstxt').html("<?=$csswarning?>").addClass("text-danger");

@@ -2,10 +2,10 @@
 /*
  * firewall_nat_1to1.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -156,7 +156,7 @@ display_top_tabs($tab_array);
 					if (get_specialnet($natent['external'], $binat_exttype_flags)) {
 						/* $natent['external'] is not an array like other addresses, and pprint_address()
 						 * requires it to be an array, so pass it in the format it expects.
-						 * https://redmine.pfsense.org/issues/14845
+						 * https://redmine.libresense.org/issues/14845
 						 */
 						echo pprint_address(['network' => $natent['external']], $binat_exttype_flags);
 					} else {

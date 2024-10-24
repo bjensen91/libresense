@@ -2,7 +2,7 @@
 #
 # rc.update_pkg_metadata
 #
-# Copyright (c) 2017-2023 Rubicon Communications, LLC (Netgate)
+# Copyright (c) 2017-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,8 +23,8 @@ else
 	sleep_time=$(jot -r 1 1 86399)
 fi
 
-# Read product_name from $g, defaults to pfSense
-product_name=$(/usr/local/sbin/read_global_var product_name pfSense)
+# Read product_name from $g, defaults to libresense
+product_name=$(/usr/local/sbin/read_global_var product_name libresense)
 
 tmp_version=$(mktemp -q /tmp/${product_name}_version.XXXXXXXX) \
 	|| exit 1

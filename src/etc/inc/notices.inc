@@ -2,11 +2,11 @@
 /*
  * notices.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2005 Colin Smith (ethethlay@gmail.com)
  * Copyright (c) 2005-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -285,7 +285,7 @@ function notices_sendqueue() {
 			unset($messages);
 		} else {
 			/* Queue does not exist or is not writable, so no action can be taken
-			 * https://redmine.pfsense.org/issues/14031
+			 * https://redmine.libresense.org/issues/14031
 			 */
 			log_error("SMTP queue does not exist or is not writable.");
 			return;
@@ -336,7 +336,7 @@ function notify_via_queue_add($message, $type='mail') {
 	if (is_file($notice_queue)) {
 		if (!is_writable($notice_queue)) {
 			/* Cannot write to notify queue, so exit early
-			 * https://redmine.pfsense.org/issues/14031
+			 * https://redmine.libresense.org/issues/14031
 			 */
 			log_error("Cannot write to the notify queue.");
 			return;
@@ -482,7 +482,7 @@ function send_smtp_message($message, $subject = "(no subject)", $force = false) 
 	if (!empty(config_get_path('notifications/smtp/fromaddress'))) {
 		$from = config_get_path('notifications/smtp/fromaddress');
 	} else {
-		$from = "pfsense@" . config_get_path('system/hostname') . '.' . config_get_path('system/domain');
+		$from = "libresense@" . config_get_path('system/hostname') . '.' . config_get_path('system/domain');
 	}
 
 	$to = config_get_path('notifications/smtp/notifyemailaddress');

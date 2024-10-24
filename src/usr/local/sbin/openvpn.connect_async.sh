@@ -2,8 +2,8 @@
 #
 # openvpn.connect_async.sh
 #
-# part of pfSense (https://www.pfsense.org)
-# Copyright (c) 2021-2023 Rubicon Communications, LLC (Netgate)
+# part of libresense (https://www.libresense.org)
+# Copyright (c) 2021-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ if [ "${script_type}" = "client-disconnect" ]; then
 	log_session "disconnected"
 
 	if [ -n "${username}" ]; then
-		# Avoid race condition. See https://redmine.pfsense.org/issues/9206
+		# Avoid race condition. See https://redmine.libresense.org/issues/9206
 		i=1
 		while
 			if [ -f "${lockfile}" ]; then
@@ -102,7 +102,7 @@ elif [ "${script_type}" = "client-connect" ]; then
 
 	# Get active sessions
 	# active_sessions :: ovpns1_'user_01'_30001|ovpns1_'user_01'_30002|ovpns1_'user_01'_30003|
-	# Use php-cgi - see https://redmine.pfsense.org/issues/12382
+	# Use php-cgi - see https://redmine.libresense.org/issues/12382
 	active_sessions=$("/usr/local/bin/php-cgi" -f "/usr/local/sbin/openvpn_connect_async.php")
 
 	# Process "Duplicate Connection Limit" setting

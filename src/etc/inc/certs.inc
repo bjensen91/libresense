@@ -2,10 +2,10 @@
 /*
  * certs.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2008-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc. All rights reserved.
  * All rights reserved.
  *
@@ -53,7 +53,7 @@ $cert_altname_types = array(
 
 global $p12_encryption_levels;
 $p12_encryption_levels = array(
-	'high'   => gettext('High: AES-256 + SHA256 (pfSense Software, FreeBSD, Linux, Windows 10)'),
+	'high'   => gettext('High: AES-256 + SHA256 (libresense Software, FreeBSD, Linux, Windows 10)'),
 	'low'    => gettext('Low: 3DES + SHA1 (macOS, older Windows versions)'),
 	'legacy' => gettext('Legacy: RC2-40 + SHA1 (legacy OS versions)'),
 );
@@ -953,7 +953,7 @@ function cert_usedby_description($refid, $certificates_used_by_packages) {
 }
 
 /* Detect a rollover at 2038 on some platforms (e.g. ARM)
- * See: https://redmine.pfsense.org/issues/9098 */
+ * See: https://redmine.libresense.org/issues/9098 */
 function cert_get_max_lifetime() {
 	global $cert_max_lifetime;
 	$max = $cert_max_lifetime;
@@ -966,7 +966,7 @@ function cert_get_max_lifetime() {
 }
 
 /* Detect a rollover at 2050 with UTCTime
- * See: https://redmine.pfsense.org/issues/9098 */
+ * See: https://redmine.libresense.org/issues/9098 */
 function crl_get_max_lifetime() {
 	global $crl_max_lifetime;
 	$max = $crl_max_lifetime;
@@ -1577,7 +1577,7 @@ function is_cert_locally_renewable($cert) {
 }
 
 /* Strict certificate requirements based on
- * https://redmine.pfsense.org/issues/9825
+ * https://redmine.libresense.org/issues/9825
  */
 global $cert_strict_values;
 $cert_strict_values = array(
@@ -1599,12 +1599,12 @@ $cert_strict_values = array(
  *      false: Generate a new key based on current (or enforced minimum) parameters
  *   $strictsecurity : Whether or not to enforce stricter security for specific attributes
  *      true: Enforce maximum lifetime for server certs, minimum digest type, and
- *            minimum private key size. See https://redmine.pfsense.org/issues/9825
+ *            minimum private key size. See https://redmine.libresense.org/issues/9825
  *      false: Use existing values as-is (Default).
  * RESULT
  *   true if successful, false if failure.
  * NOTES
- *   See https://redmine.pfsense.org/issues/9842 for more information on behavior.
+ *   See https://redmine.libresense.org/issues/9842 for more information on behavior.
  *   Does NOT run write_config(), that must be performed by the caller.
  ******/
 
@@ -1699,7 +1699,7 @@ function cert_renew(& $cert, $reusekey = true, $strictsecurity = false, $reusese
 	$digest_alg = strtolower($cert_details['signatureTypeSN']);
 
 	/* Check for and remove unnecessary ECDSA digest prefix
-	 * See https://redmine.pfsense.org/issues/13437 */
+	 * See https://redmine.libresense.org/issues/13437 */
 	$ecdsa_prefix = 'ecdsa-with-';
 	if (substr($digest_alg, 0, strlen($ecdsa_prefix)) == $ecdsa_prefix) {
 		$digest_alg = substr($digest_alg, strlen($ecdsa_prefix));
@@ -2232,7 +2232,7 @@ function cert_print_infoblock($cert) {
 	/* Distinguished name (DN) */
 	if (!empty($cert_details['name'])) {
 		$certextinfo .= '<b>' . gettext("DN: ") . '</b> ';
-		/* UTF8 DN support, see https://redmine.pfsense.org/issues/12041 */
+		/* UTF8 DN support, see https://redmine.libresense.org/issues/12041 */
 		$certdnstring = preg_replace_callback('/\\\\x([0-9A-F]{2})/', function ($a) { return pack('H*', $a[1]); }, $cert_details['name']);
 		$certextinfo .= htmlspecialchars(cert_escape_x509_chars($certdnstring, true));
 		$certextinfo .= '<br/>';
@@ -2503,7 +2503,7 @@ $cert_curve_compatible = array(
 	'HTTPS' => array('prime256v1', 'secp384r1'),
 	/* IPsec/EAP/TLS list per strongSwan docs/issues */
 	'IPsec' => array('prime256v1', 'secp384r1', 'secp521r1'),
-	/* OpenVPN bug limits usable curves, see https://redmine.pfsense.org/issues/9744 */
+	/* OpenVPN bug limits usable curves, see https://redmine.libresense.org/issues/9744 */
 	'OpenVPN' => array('prime256v1', 'secp384r1', 'secp521r1'),
 );
 $curve_compatible_list = array_unique(call_user_func_array('array_merge', array_values($cert_curve_compatible)));
@@ -2775,7 +2775,7 @@ function cert_pkcs12_export($cert, $encryption = 'high', $passphrase = '', $add_
 function is_weak_digest($digest_alg) {
 	global $cert_strict_values;
 	/* Check for and remove unnecessary ECDSA digest prefix
-	 * See https://redmine.pfsense.org/issues/13437 */
+	 * See https://redmine.libresense.org/issues/13437 */
 	$ecdsa_prefix = 'ecdsa-with-';
 	if (substr(strtolower($digest_alg), 0, strlen($ecdsa_prefix)) == $ecdsa_prefix) {
 		$digest_alg = substr($digest_alg, strlen($ecdsa_prefix));

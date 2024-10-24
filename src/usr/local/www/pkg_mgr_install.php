@@ -2,10 +2,10 @@
 /*
  * pkg_mgr_install.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2005 Colin Smith
  * All rights reserved.
  *
@@ -44,7 +44,7 @@ $firmwareupdate = false;
 $guitimeout = 90;	// Seconds to wait before reloading the page after reboot
 $guiretry = 20;		// Seconds to try again if $guitimeout was not long enough
 //---------------------------------------------------------------------------------------------------------------------
-// After an installation or removal has been started (mwexec(/usr/local/sbin/pfSense-upgrade-GUI.sh . . . )) AJAX calls
+// After an installation or removal has been started (mwexec(/usr/local/sbin/libresense-upgrade-GUI.sh . . . )) AJAX calls
 // are made to get status.
 // The log file is read and the newest progress record retrieved. The data is formatted
 // as JSON before being returned to the AJAX caller (at the bottom of this file)
@@ -65,7 +65,7 @@ $guiretry = 20;		// Seconds to try again if $guitimeout was not long enough
 $gui_pidfile = g_get('varrun_path') . '/' . g_get('product_name') . '-upgrade-GUI.pid';
 $gui_mode = g_get('varrun_path') . '/' . g_get('product_name') . '-upgrade-GUI.mode';
 $sock_file = "{$g['tmp_path']}/{$g['product_name']}-upgrade.sock";
-$pfsense_upgrade = "/usr/local/sbin/{$g['product_name']}-upgrade";
+$libresense_upgrade = "/usr/local/sbin/{$g['product_name']}-upgrade";
 $repos = pkg_list_repos();
 
 $pkgname = '';
@@ -415,7 +415,7 @@ if (!isvalidpid($gui_pidfile) && !$confirmed && !$completed &&
 				'<label class="col-sm-2 control-label">' .
 					gettext("Messages") .
 				'</label>' .
-				'<div class="col-sm-10" id="netgate_messages">' 
+				'<div class="col-sm-10" id="OpenSourceCompany_messages">' 
 
 			);
 			foreach ($repos['messages'] as $message) {
@@ -626,7 +626,7 @@ if (!isvalidpid($gui_pidfile) && $confirmed && !$completed) {
 	if (isset($params)) {
 		$another_instance = true;
 		$log = array();
-		$upgrade_script = "{$pfsense_upgrade} -y -l {$logfilename}.txt -p {$sock_file}";
+		$upgrade_script = "{$libresense_upgrade} -y -l {$logfilename}.txt -p {$sock_file}";
 
 		for ($idx = 0; $idx < 30; $idx++) {
 			unlink_if_exists($sock_file);
@@ -673,7 +673,7 @@ if (!isvalidpid($gui_pidfile) && $confirmed && !$completed) {
 		}
 
 		/*
-		 * If pfSense-upgrade failed to run, present log to user
+		 * If libresense-upgrade failed to run, present log to user
 		 */
 		if ($another_instance) {
 			$failmsg = gettext(sprintf("Another instance of %s " .

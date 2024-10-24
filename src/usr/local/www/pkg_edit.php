@@ -2,10 +2,10 @@
 /*
  * pkg_edit.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,7 @@ require_once("functions.inc");
 require_once("guiconfig.inc");
 require_once("shaper.inc");
 require_once("pkg-utils.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("util.inc");
 
 $xml = htmlspecialchars($_REQUEST['xml']);
@@ -94,8 +94,8 @@ if ($config['installedpackages'] && !is_array($config['installedpackages'][xml_s
 
 /* If the first entry in the array is an empty <config/> tag, kill it.
  * See the following tickets for more:
- *  https://redmine.pfsense.org/issues/7624
- *  https://redmine.pfsense.org/issues/476
+ *  https://redmine.libresense.org/issues/7624
+ *  https://redmine.libresense.org/issues/476
  */
 
 init_config_arr(array('installedpackages', xml_safe_fieldname($pkg['name']), 'config'));
@@ -221,7 +221,7 @@ if ($_POST) {
 
 			/* If the user supplied an ID and it exists, or if id=0
 			 * and the settings are invalid, overwrite.
-			 * See https://redmine.pfsense.org/issues/7624
+			 * See https://redmine.libresense.org/issues/7624
 			 */
 			if (isset($id) && ($a_pkg[$id] ||
 			   (($id == 0) && !is_array($a_pkg[$id])) )) {
@@ -258,11 +258,11 @@ if ($_POST) {
 			}
 
 			if ($pkg['aftersaveredirect'] != "") {
-				pfSenseHeader($pkg['aftersaveredirect']);
+				libresenseHeader($pkg['aftersaveredirect']);
 			} elseif (!$pkg['adddeleteeditpagefields']) {
-				pfSenseHeader("pkg_edit.php?xml={$xml}&id=0");
+				libresenseHeader("pkg_edit.php?xml={$xml}&id=0");
 			} elseif (!$pkg['preoutput']) {
-				pfSenseHeader("pkg.php?xml=" . $xml);
+				libresenseHeader("pkg.php?xml=" . $xml);
 			}
 			exit;
 		} else {
@@ -572,7 +572,7 @@ if ($pkg['tabs'] != "") {
 		$colonpos = strpos($addresswithport, ":");
 
 		if ($colonpos !== False) {
-			//my url is actually just the IP address of the pfsense box
+			//my url is actually just the IP address of the libresense box
 			$myurl = substr($addresswithport, 0, $colonpos);
 		} else {
 			$myurl = $addresswithport;

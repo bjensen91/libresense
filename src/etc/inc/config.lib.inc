@@ -2,10 +2,10 @@
 /*
  * config.lib.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2009 Erik Kristensen
  * All rights reserved.
  *
@@ -56,7 +56,7 @@ function encrypted_configxml() {
 			echo "\nEnter the password to decrypt config.xml: ";
 			$decrypt_password = chop(fgets($fp));
 			$data = decrypt_data($configtxt, $decrypt_password);
-			if (!strstr($data, "<pfsense>")) {
+			if (!strstr($data, "<libresense>")) {
 				$data = "";
 			}
 			if ($data) {
@@ -66,7 +66,7 @@ function encrypted_configxml() {
 				exec("/bin/mv {$g['conf_path']}/config.xml.tmp {$g['conf_path']}/config.xml");
 				echo "\n" . gettext("Config.xml unlocked.") . "\n";
 				fclose($fp);
-				//pfSense_fsync("{$g['conf_path']}/config.xml");
+				//libresense_fsync("{$g['conf_path']}/config.xml");
 			} else {
 				echo "\n" . gettext("Invalid password entered.  Please try again.") . "\n";
 			}
@@ -92,7 +92,7 @@ function parse_config($parse = false) {
 		$last_backup = discover_last_backup();
 		if ($last_backup) {
 			log_error(gettext("No config.xml found, attempting last known config restore."));
-			file_notice("config.xml", gettext("No config.xml found, attempting last known config restore."), "pfSenseConfigurator", "");
+			file_notice("config.xml", gettext("No config.xml found, attempting last known config restore."), "libresenseConfigurator", "");
 			restore_backup("{$g['conf_path']}/backup/{$last_backup}");
 		} else {
 			unlock($lockkey);
@@ -123,7 +123,7 @@ function parse_config($parse = false) {
 				echo ".";
 			}
 			log_error("No config.xml found, attempting last known config restore.");
-			file_notice("config.xml", "No config.xml found, attempting last known config restore.", "pfSenseConfigurator", "");
+			file_notice("config.xml", "No config.xml found, attempting last known config restore.", "libresenseConfigurator", "");
 			$last_backup = discover_last_backup();
 			if ($last_backup) {
 				restore_backup("/cf/conf/backup/{$last_backup}");
@@ -133,7 +133,7 @@ function parse_config($parse = false) {
 				die(gettext("Config.xml is corrupted and is 0 bytes.  Could not restore a previous backup."));
 			}
 		}
-		$config = parse_xml_config(g_get('conf_path') . '/config.xml', array(g_get('xml_rootobj'), 'pfsense'));
+		$config = parse_xml_config(g_get('conf_path') . '/config.xml', array(g_get('xml_rootobj'), 'libresense'));
 		if ($config == -1) {
 			$last_backup = discover_last_backup();
 			if ($last_backup) {
@@ -175,7 +175,7 @@ function generate_config_cache($config) {
 	}
 	fwrite($configcache, serialize($config));
 	fclose($configcache);
-	//pfSense_fsync("{$g['tmp_path']}/config.cache");
+	//libresense_fsync("{$g['tmp_path']}/config.cache");
 
 	unset($configcache);
 	/* Used for config.extra.xml */
@@ -183,7 +183,7 @@ function generate_config_cache($config) {
 		$configcacheextra = fopen(g_get('tmp_path') . '/config.extra.cache', "w");
 		fwrite($configcacheextra, serialize($config_extra));
 		fclose($configcacheextra);
-		//pfSense_fsync("{$g['tmp_path']}/config.extra.cache");
+		//libresense_fsync("{$g['tmp_path']}/config.extra.cache");
 		unset($configcacheextra);
 	}
 	return true;
@@ -195,7 +195,7 @@ function discover_last_backup() {
 	$backups = glob('/cf/conf/backup/*.xml');
 	foreach (array_reverse($backups) as $backup) {
 		/* checking multiple backups when detecting invalid configuration
-		 * https://redmine.pfsense.org/issues/11748 */
+		 * https://redmine.libresense.org/issues/11748 */
 		if (filesize($backup) != 0) {
 			$testconfig = parse_xml_config($backup, g_get('xml_rootobj'));
 			if ($testconfig != -1) {
@@ -212,7 +212,7 @@ function restore_backup($file) {
 
 	if (file_exists($file)) {
 		/* restore rrddata/xmldata and clear appropriate data,
-		 * see https://redmine.pfsense.org/issues/11050 */
+		 * see https://redmine.libresense.org/issues/11050 */
 		$data = file_get_contents("$file");
 		$conf = parse_xml_config("$file", g_get('xml_rootobj'));
 		if ($conf['rrddata']) {
@@ -232,11 +232,11 @@ function restore_backup($file) {
 		file_put_contents($file, $data);
 		unlink_if_exists("{$g['tmp_path']}/config.cache");
 		copy("$file", "/cf/conf/config.xml");
-		//pfSense_fsync("/cf/conf/config.xml");
-		//pfSense_fsync($g['conf_path']);
+		//libresense_fsync("/cf/conf/config.xml");
+		//libresense_fsync($g['conf_path']);
 		disable_security_checks();
 		log_error(sprintf(gettext('%1$s is restoring the configuration %2$s'), g_get('product_label'), $file));
-		file_notice("config.xml", sprintf(gettext('%1$s is restoring the configuration %2$s'), g_get('product_label'), $file), "pfSenseConfigurator", "");
+		file_notice("config.xml", sprintf(gettext('%1$s is restoring the configuration %2$s'), g_get('product_label'), $file), "libresenseConfigurator", "");
 	}
 }
 
@@ -245,9 +245,9 @@ function restore_backup($file) {
  */
 
 /* If the config on disk had rrddata/xmldata tags already, remove that section first.
- * See https://redmine.pfsense.org/issues/8994,
- *     https://redmine.pfsense.org/issues/10508,
- *     https://redmine.pfsense.org/issues/11050 */
+ * See https://redmine.libresense.org/issues/8994,
+ *     https://redmine.libresense.org/issues/10508,
+ *     https://redmine.libresense.org/issues/11050 */
 function clear_tagdata($tag, $data) {
 	$data = preg_replace("/[[:blank:]]*<{$tag}data>.*<\\/{$tag}data>[[:blank:]]*\n*/s", "", $data);
 	$data = preg_replace("/[[:blank:]]*<{$tag}data\\/>[[:blank:]]*\n*/", "", $data);
@@ -373,7 +373,7 @@ function parse_config_bootup() {
 			$last_backup = discover_last_backup();
 			if ($last_backup) {
 				log_error("No config.xml found, attempting last known config restore.");
-				file_notice("config.xml", gettext("No config.xml found, attempting last known config restore."), "pfSenseConfigurator", "");
+				file_notice("config.xml", gettext("No config.xml found, attempting last known config restore."), "libresenseConfigurator", "");
 				restore_backup("/cf/conf/backup/{$last_backup}");
 			}
 			if (!file_exists("{$g['conf_path']}/config.xml")) {
@@ -382,7 +382,7 @@ function parse_config_bootup() {
 				die(gettext("Could not find a usable configuration file or it's backup! Exiting...."));
 			} else {
 				log_error("Last known config found and restored.  Please double check the configuration file for accuracy.");
-				file_notice("config.xml", gettext("Last known config found and restored.  Please double check the configuration file for accuracy."), "pfSenseConfigurator", "");
+				file_notice("config.xml", gettext("Last known config found and restored.  Please double check the configuration file for accuracy."), "libresenseConfigurator", "");
 			}
 		} else {
 			unlock($lockkey);
@@ -395,7 +395,7 @@ function parse_config_bootup() {
 		$last_backup = discover_last_backup();
 		if ($last_backup) {
 			log_error(gettext("No config.xml found, attempting last known config restore."));
-			file_notice("config.xml", gettext("No config.xml found, attempting last known config restore."), "pfSenseConfigurator", "");
+			file_notice("config.xml", gettext("No config.xml found, attempting last known config restore."), "libresenseConfigurator", "");
 			restore_backup("{$g['conf_path']}/backup/{$last_backup}");
 		} else {
 			unlock($lockkey);
@@ -575,8 +575,8 @@ function safe_write_file($file, $content, $force_binary = false) {
 	fflush($fd);
 	fclose($fd);
 
-	/* XXX Re-add pfSense_fsync() call here after it's fixed */
-	// if (!pfSense_fsync($tmp_file) || !rename($tmp_file, $file)) {
+	/* XXX Re-add libresense_fsync() call here after it's fixed */
+	// if (!libresense_fsync($tmp_file) || !rename($tmp_file, $file)) {
 	if (!rename($tmp_file, $file)) {
 		// Unable to move temporary file to original
 		@unlink($tmp_file);
@@ -584,7 +584,7 @@ function safe_write_file($file, $content, $force_binary = false) {
 	}
 
 	// Sync file before returning
-	//return pfSense_fsync($file);
+	//return libresense_fsync($file);
 	return true;
 }
 
@@ -952,7 +952,7 @@ function cleanup_backupcache($lock = false) {
 				echo ".";
 			}
 			try {
-				$newxml = parse_xml_config($backup, array(g_get('xml_rootobj'), 'pfsense'));
+				$newxml = parse_xml_config($backup, array(g_get('xml_rootobj'), 'libresense'));
 			} catch (Exception $exc) {
 				log_error(sprintf(gettext("The backup cache file %s is corrupted. Parser error message: %s"), $backup, $exc->getMessage()));
 				$newxml = "-1";
@@ -999,7 +999,7 @@ function cleanup_backupcache($lock = false) {
 	$bakout = fopen(g_get('cf_conf_path') . '/backup/backup.cache', "w");
 	fwrite($bakout, serialize($tocache));
 	fclose($bakout);
-	//pfSense_fsync("{$g['cf_conf_path']}/backup/backup.cache");
+	//libresense_fsync("{$g['cf_conf_path']}/backup/backup.cache");
 
 	if (!$lock) {
 		unlock($lockkey);
@@ -1055,7 +1055,7 @@ function backup_config() {
 	$bakout = fopen(g_get('cf_conf_path') . '/backup/backup.cache', "w");
 	fwrite($bakout, serialize($backupcache));
 	fclose($bakout);
-	//pfSense_fsync("{$g['cf_conf_path']}/backup/backup.cache");
+	//libresense_fsync("{$g['cf_conf_path']}/backup/backup.cache");
 
 
 	return true;
@@ -1140,7 +1140,7 @@ function make_config_revision_entry($desc = null, $override_user = null) {
 	return $revision;
 }
 
-function pfSense_clear_globals() {
+function libresense_clear_globals() {
 	global $config, $g, $FilterIfList, $GatewaysList, $filterdns, $aliases, $aliastable;
 
 	$error = error_get_last();
@@ -1259,4 +1259,4 @@ function config_del_path(string $path) {
 	global $config;
 	return (array_del_path($config, $path));
 }
-register_shutdown_function('pfSense_clear_globals');
+register_shutdown_function('libresense_clear_globals');

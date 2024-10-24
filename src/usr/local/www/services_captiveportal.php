@@ -2,10 +2,10 @@
 /*
  * services_captiveportal.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -1020,17 +1020,17 @@ $section->addInput(new Form_Checkbox(
 $section->addInput(new Form_Checkbox(
 	'radiustraffic_quota',
 	'Traffic quota',
-	'Use RADIUS pfSense-Max-Total-Octets attribute',
+	'Use RADIUS libresense-Max-Total-Octets attribute',
 	$pconfig['radiustraffic_quota']
-))->setHelp('When enabled, clients will be disconnected after exceeding the amount of traffic, inclusive of both downloads and uploads, retrieved from the RADIUS pfSense-Max-Total-Octets attribute.');
+))->setHelp('When enabled, clients will be disconnected after exceeding the amount of traffic, inclusive of both downloads and uploads, retrieved from the RADIUS libresense-Max-Total-Octets attribute.');
 
 $section->addInput(new Form_Checkbox(
 	'radiusperuserbw',
 	'Per-user bandwidth restrictions',
-	'Use RADIUS pfSense-Bandwidth-Max-Up and pfSense-Bandwidth-Max-Down attributes',
+	'Use RADIUS libresense-Bandwidth-Max-Up and libresense-Bandwidth-Max-Down attributes',
 	$pconfig['radiusperuserbw']
-))->setHelp('When enabled, the bandwidth assigned to a client will be limited to the values retrieved from the RADIUS pfSense-Bandwidth-Max-Up and ' .
-			'pfSense-Bandwidth-Max-Down attributes or from the comparable WISPr attributes.');
+))->setHelp('When enabled, the bandwidth assigned to a client will be limited to the values retrieved from the RADIUS libresense-Bandwidth-Max-Up and ' .
+			'libresense-Bandwidth-Max-Down attributes or from the comparable WISPr attributes.');
 
 $section->addInput(new Form_Select(
 	'radmac_format',

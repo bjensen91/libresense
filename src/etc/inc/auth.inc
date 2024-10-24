@@ -2,13 +2,13 @@
 /*
  * auth.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2003-2006 Manuel Kasper <mk@neon1.net>
  * Copyright (c) 2005-2006 Bill Marquette <bill.marquette@gmail.com>
  * Copyright (c) 2006 Paul Taylor <paultaylor@winn-dixie.com>
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ if (!$do_not_include_config_gui_inc) {
 $security_passed = true;
 
 /* Possible user password hash types.
- * See https://redmine.pfsense.org/issues/12855
+ * See https://redmine.libresense.org/issues/12855
  */
 global $auth_password_hash_types;
 $auth_password_hash_types = array(
@@ -62,11 +62,11 @@ if (function_exists("display_error_form")) {
 			/* They may never see the error since the connection will be cut off, but try to be nice anyhow. */
 			display_error_form("501", gettext("Access Denied<br/><br/>Access attempt from a temporarily locked out client address.<br /><br />Try accessing the firewall again after the lockout expires."));
 			/* If they are locked out, they shouldn't have a state. Disconnect their connections. */
-			$retval = pfSense_kill_states($_SERVER['REMOTE_ADDR']);
+			$retval = libresense_kill_states($_SERVER['REMOTE_ADDR']);
 			if (is_ipaddrv4($_SERVER['REMOTE_ADDR'])) {
-				$retval = pfSense_kill_states("0.0.0.0/0", $_SERVER['REMOTE_ADDR']);
+				$retval = libresense_kill_states("0.0.0.0/0", $_SERVER['REMOTE_ADDR']);
 			} elseif (is_ipaddrv6($_SERVER['REMOTE_ADDR'])) {
-				$retval = pfSense_kill_states("::", $_SERVER['REMOTE_ADDR']);
+				$retval = libresense_kill_states("::", $_SERVER['REMOTE_ADDR']);
 			}
 			exit;
 		}
@@ -75,7 +75,7 @@ if (function_exists("display_error_form")) {
 }
 
 if (function_exists("display_error_form") && !config_path_enabled('system/webgui', 'nodnsrebindcheck')) {
-	/* DNS ReBinding attack prevention.  https://redmine.pfsense.org/issues/708 */
+	/* DNS ReBinding attack prevention.  https://redmine.libresense.org/issues/708 */
 	$found_host = false;
 
 	/* Either a IPv6 address with or without a alternate port */
@@ -155,7 +155,7 @@ if (function_exists("display_error_form") && !config_path_enabled('system/webgui
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<link rel="stylesheet" href="/css/pfSense.css" />
+	<link rel="stylesheet" href="/css/libresense.css" />
 	<title><?=gettext("Redirecting..."); ?></title>
 </head>
 <body id="error" class="no-menu">
@@ -239,7 +239,7 @@ if (function_exists("display_error_form") && !config_path_enabled('system/webgui
 
 			/* Fall back to probing active interface addresses rather than config.xml to allow
 			 * changed addresses that have not yet been applied.
-			 * See https://redmine.pfsense.org/issues/8822
+			 * See https://redmine.libresense.org/issues/8822
 			 */
 			if (!$found_host) {
 				$refifs = get_interface_arr();
@@ -418,7 +418,7 @@ function userHasPrivilege($userent, $privid = false) {
 	/* If someone is in admins group or is admin, do not honor the
 	 * user-config-readonly privilege to prevent foot-shooting due to a
 	 * bad privilege config.
-	 * https://redmine.pfsense.org/issues/10492 */
+	 * https://redmine.libresense.org/issues/10492 */
 	$userGroups = getUserGroups($userent['name'],
 			auth_get_authserver(config_get_path('system/webgui/authmode')),
 			$_SESSION['user_radius_attributes']);
@@ -453,7 +453,7 @@ function local_backed($username, $passwd) {
 		}
 	}
 
-	// pfSense < 2.3 password hashing, see https://redmine.pfsense.org/issues/4120
+	// libresense < 2.3 password hashing, see https://redmine.libresense.org/issues/4120
 	if ($user['password']) {
 		if (hash_equals($user['password'], crypt($passwd, $user['password']))) {
 			return true;
@@ -824,7 +824,7 @@ function local_user_set_password(&$user, $password) {
 	unset($user['bcrypt-hash']);
 
 	/* Default to bcrypt hashing if unset.
-	 * See https://redmine.pfsense.org/issues/12855
+	 * See https://redmine.libresense.org/issues/12855
 	 */
 	$hashalgo = config_get_path('system/webgui/pwhash', 'bcrypt');
 
@@ -909,7 +909,7 @@ function local_user_set_groups($user, $new_groups = NULL) {
 		}
 	}
 	/* Clear $ngroup reference.
-	 * https://redmine.pfsense.org/issues/14363 */
+	 * https://redmine.libresense.org/issues/14363 */
 	unset($ngroup);
 
 	/* determine which memberships to remove */
@@ -928,7 +928,7 @@ function local_user_set_groups($user, $new_groups = NULL) {
 		}
 	}
 	/* Clear $cgroup reference.
-	 * https://redmine.pfsense.org/issues/14363 */
+	 * https://redmine.libresense.org/issues/14363 */
 	unset($cgroup);
 
 	config_set_path('system/group', $groups);
@@ -1783,7 +1783,7 @@ function radius_backed($username, $password, $authcfg, &$attributes = array()) {
 	} else {
 		$nasid = $attributes['nas_identifier'];
 		if (empty($nasid)) {
-			$nasid = gethostname(); //If no RADIUS NAS-Identifier is given : we use pfsense's hostname as NAS-Identifier
+			$nasid = gethostname(); //If no RADIUS NAS-Identifier is given : we use libresense's hostname as NAS-Identifier
 		}
 		$nasip = nasip_fallback($authcfg['radius_nasip_attribute']);
 		$nasmac = get_interface_mac(find_ip_interface($nasip));
@@ -1848,7 +1848,7 @@ function nasip_fallback($ip) {
 
 		if (!is_ipaddr($nasip)) {
 			/* use first interface with IP as fallback for NAS-IP-Address
-			 * see https://redmine.pfsense.org/issues/11109 */
+			 * see https://redmine.libresense.org/issues/11109 */
 			foreach (get_configured_interface_list() as $if) {
 				$nasip = get_interface_ip($if);
 				if (is_ipaddr($nasip)) {
@@ -2236,10 +2236,10 @@ function session_auth() {
 function print_credit() {
 	global $g;
 
-	return  '<a target="_blank" href="https://pfsense.org">' . g_get('product_label') . '</a>' .
+	return  '<a target="_blank" href="https://libresense.org">' . g_get('product_label') . '</a>' .
 			gettext(' is developed and maintained by ') .
-			'<a target="_blank" href="https://netgate.com">Netgate. </a>' . ' &copy; ESF ' . g_get('product_copyright_years') .
-			'<a target="_blank" href="https://pfsense.org/license">' .
+			'<a target="_blank" href="https://OpenSourceCompany.com">OpenSourceCompany. </a>' . ' &copy; ESF ' . g_get('product_copyright_years') .
+			'<a target="_blank" href="https://libresense.org/license">' .
 			gettext(' View license.') . '</a>';
 }
 function get_user_remote_address($print_all=true) {

@@ -19,20 +19,20 @@
  * limitations under the License.
  */
 
-$pfSense_platform_file = '/etc/platform';
+$libresense_platform_file = '/etc/platform';
 
-$is_pfSense = file_exists($pfSense_platform_file);
-if ($is_pfSense) {
-	if ( ! preg_match('/^pfSense/i', file_get_contents($pfSense_platform_file))) {
-		$is_pfSense = false;
+$is_libresense = file_exists($libresense_platform_file);
+if ($is_libresense) {
+	if ( ! preg_match('/^libresense/i', file_get_contents($libresense_platform_file))) {
+		$is_libresense = false;
 	}
 }
 
-if ($is_pfSense) {
+if ($is_libresense) {
 	require_once('tools_for_debugging_n_testing.inc');
 	require_once('parser_ipv6.inc');
 } else {
-	/* Handle situation where we use source files on a non-running pfSense system.
+	/* Handle situation where we use source files on a non-running libresense system.
 	 * Get from this file back to 'src' so we can use 'src/etc/inc/'.
 	 */
 	define('__ROOT__', dirname(dirname(dirname(dirname(__FILE__)))));

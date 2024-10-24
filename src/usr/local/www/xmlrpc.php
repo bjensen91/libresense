@@ -2,10 +2,10 @@
 /*
  * xmlrpc.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2005 Colin Smith
  * All rights reserved.
  *
@@ -40,7 +40,7 @@ require_once("captiveportal.inc");
 require_once("shaper.inc");
 require_once("XML/RPC2/Server.php");
 
-class pfsense_xmlrpc_server {
+class libresense_xmlrpc_server {
 
 	private $loop_detected = false;
 	private $remote_addr;
@@ -258,7 +258,7 @@ class pfsense_xmlrpc_server {
 		}
 
 		/* Only touch users if users are set to synchronize from the primary node
-		 * See https://redmine.pfsense.org/issues/8450
+		 * See https://redmine.libresense.org/issues/8450
 		 */
 		if ($sections['system']['user'] && $sections['system']['group']) {
 			$g2add = array();
@@ -343,7 +343,7 @@ class pfsense_xmlrpc_server {
 
 			foreach($sections['voucher'] as $zone => $item) {
 				unset($sections['voucher'][$zone]['roll']);
-				// Note : This code can be safely deleted once #97 fix has been applied and deployed to pfSense stable release.
+				// Note : This code can be safely deleted once #97 fix has been applied and deployed to libresense stable release.
 				// Please do not delete this code before
 				if (isset($config['voucher'][$zone]['vouchersyncdbip'])) {
 					$sections['voucher'][$zone]['vouchersyncdbip'] =
@@ -585,7 +585,7 @@ class pfsense_xmlrpc_server {
 					if (does_vip_exist($vip) && isset($oldvips[$key]['vhid']) &&
 					    ($oldvips[$key]['vhid'] ^ $vip['vhid'])) {
 						/* properly remove the old VHID
-						 * see https://redmine.pfsense.org/issues/12202 */
+						 * see https://redmine.libresense.org/issues/12202 */
 						$realif = get_real_interface($vip['interface']);
 						mwexec("/sbin/ifconfig {$realif} " .
 							escapeshellarg($vip['subnet']) . " -alias");
@@ -622,7 +622,7 @@ class pfsense_xmlrpc_server {
 					     escapeshellarg($oldvipar['subnet']) .
 					     " delete");
 				} else {
-					pfSense_interface_deladdress($oldvipif,
+					libresense_interface_deladdress($oldvipif,
 					    $oldvipar['subnet']);
 				}
 			}
@@ -710,7 +710,7 @@ class pfsense_xmlrpc_server {
 		setup_gateways_monitor();
 
 		/* do not restart unchanged services on XMLRPC sync,
-		 * see https://redmine.pfsense.org/issues/11082 
+		 * see https://redmine.libresense.org/issues/11082 
 		 */
 		if (is_array($config['openvpn']) || is_array($old_config['openvpn'])) {
 			foreach (array("server", "client") as $type) {
@@ -756,7 +756,7 @@ class pfsense_xmlrpc_server {
 			openvpn_resync_csc_all();
 		}
 
-		/* run ipsec_configure() on any IPsec change, see https://redmine.pfsense.org/issues/12075 */
+		/* run ipsec_configure() on any IPsec change, see https://redmine.libresense.org/issues/12075 */
 		if (((is_array($config['ipsec']) || is_array($old_config['ipsec'])) &&
 		    ($config['ipsec'] != $old_config['ipsec'])) ||
 		    $force) {
@@ -978,12 +978,12 @@ XML_RPC2_Backend::setBackend('php');
 $HTTP_RAW_POST_DATA = file_get_contents('php://input');
 
 $options = array(
-	'prefix' => 'pfsense.',
+	'prefix' => 'libresense.',
 	'encoding' => 'utf-8',
 	'autoDocument' => false,
 );
 
-$server = XML_RPC2_Server::create(new pfsense_xmlrpc_server(), $options);
+$server = XML_RPC2_Server::create(new libresense_xmlrpc_server(), $options);
 $server->handleCall();
 
 unlock($xmlrpclockkey);

@@ -2,10 +2,10 @@
 /*
  * syslog.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -114,7 +114,7 @@ function rsort_log_filename($a, $b) {
 	 * Compressed:   /var/log/<name>.log.<number>.<compressed extension>
 	 * Uncompressed: /var/log/<name>.log.<number>
 	 *
-	 * See: https://redmine.pfsense.org/issues/11639
+	 * See: https://redmine.libresense.org/issues/11639
 	 */
 	$aparts = explode('.', $a);
 	/* If the last part is not a number, it's a compressed log extension,
@@ -163,7 +163,7 @@ function clear_all_log_files($restart = false) {
 	}
 
 	/* Combine list of syslog and non-syslog log files */
-	/* exclude dmesg.boot, see https://redmine.pfsense.org/issues/11428 */
+	/* exclude dmesg.boot, see https://redmine.libresense.org/issues/11428 */
 	foreach (array_merge(system_syslogd_get_all_logfilenames(true), array_diff($system_log_non_syslog_files, array('dmesg.boot'))) as $lfile) {
 		clear_log_file("{$g['varlog_path']}/{$lfile}", false);
 	}
@@ -377,8 +377,8 @@ EOD;
 		$syslogconf .= system_syslogd_get_remote_servers($syslogcfg, "*.*");
 	}
 
-	/* write syslog config to pfSense.conf */
-	if (!@file_put_contents("{$g['varetc_path']}/syslog.d/pfSense.conf", $syslogconf)) {
+	/* write syslog config to libresense.conf */
+	if (!@file_put_contents("{$g['varetc_path']}/syslog.d/libresense.conf", $syslogconf)) {
 		printf(gettext("Error: cannot open syslog config file in system_syslogd_start().%s"), "\n");
 		unset($syslogconf);
 		return 1;
@@ -578,7 +578,7 @@ EOD;
 		$newsyslogconf .= system_log_rotation_make_line("{$g['varlog_path']}/{$logfile}.log", 'root:wheel', 600, $local_rotate_count, $local_log_size, '*', "{$compression_flag}C");
 	}
 
-	if (!@file_put_contents("{$g['varetc_path']}/newsyslog.conf.d/pfSense.conf", $newsyslogconf)) {
+	if (!@file_put_contents("{$g['varetc_path']}/newsyslog.conf.d/libresense.conf", $newsyslogconf)) {
 		printf(gettext("Error: cannot open syslog config file in system_log_rotation_setup().%s"), "\n");
 	}
 	unset($newsyslogconf);
@@ -1265,7 +1265,7 @@ function buffer_rules_load() {
 		}
 	}
 
-	$rules = pfSense_get_pf_rules();
+	$rules = libresense_get_pf_rules();
 	if (is_array($rules)) {
 		foreach ($rules as $rule) {
 			$key = sprintf("%d", $rule['tracker']);

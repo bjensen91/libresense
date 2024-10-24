@@ -2,10 +2,10 @@
 /*
  * status.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://neon1.net/m0n0wall)
@@ -285,8 +285,8 @@ include("head.inc"); ?>
 <?php print_info_box(status_get_firewall_info(), 'info', false);
 
 /* Call any registeredd package plugins which define status output to include
- * See https://redmine.pfsense.org/issues/14777 and
- *     https://redmine.pfsense.org/issues/1458
+ * See https://redmine.libresense.org/issues/14777 and
+ *     https://redmine.libresense.org/issues/1458
  */
 $pluginparams = array();
 $pluginparams['type'] = 'statusoutput';

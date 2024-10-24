@@ -2,10 +2,10 @@
 /*
  * system_crlmanager.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@
 require_once("guiconfig.inc");
 require_once("certs.inc");
 require_once("openvpn.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("vpn.inc");
 
 $max_lifetime = crl_get_max_lifetime();
@@ -77,7 +77,7 @@ if ((!empty($act) &&
     ($act != 'new') &&
     !$thiscrl) ||
     (($act == 'del') && empty($_POST))) {
-	pfSenseHeader("system_camanager.php");
+	libresenseHeader("system_camanager.php");
 	$act="";
 	$savemsg = gettext("Invalid CRL reference.");
 	$class = "danger";
@@ -135,7 +135,7 @@ switch ($act) {
 
 		$revoke_list = array();
 		if (!$pconfig['crlref']) {
-			pfSenseHeader("system_crlmanager.php");
+			libresenseHeader("system_crlmanager.php");
 			exit;
 		}
 		$crl =& lookup_crl($pconfig['crlref']);
@@ -185,7 +185,7 @@ switch ($act) {
 				$savemsg = "Saved CRL {$crl['descr']}.";
 			}
 			write_config($savemsg);
-			pfSenseHeader("system_crlmanager.php");
+			libresenseHeader("system_crlmanager.php");
 			exit;
 		} else {
 			$act = 'edit';
@@ -193,7 +193,7 @@ switch ($act) {
 		break;
 	case 'delcert':
 		if (!is_array($thiscrl['cert'])) {
-			pfSenseHeader("system_crlmanager.php");
+			libresenseHeader("system_crlmanager.php");
 			exit;
 		}
 		$found = false;
@@ -204,7 +204,7 @@ switch ($act) {
 			}
 		}
 		if (!$found) {
-			pfSenseHeader("system_crlmanager.php");
+			libresenseHeader("system_crlmanager.php");
 			exit;
 		}
 		$certname = htmlspecialchars($thiscert['descr']);
@@ -298,7 +298,7 @@ if ($_POST['save'] && empty($input_errors)) {
 		// refresh IPsec and OpenVPN CRLs
 		openvpn_refresh_crls();
 		ipsec_configure();
-		pfSenseHeader("system_crlmanager.php");
+		libresenseHeader("system_crlmanager.php");
 	}
 }
 

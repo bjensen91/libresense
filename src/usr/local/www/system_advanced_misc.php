@@ -2,10 +2,10 @@
 /*
  * system_advanced_misc.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc
  * All rights reserved.
  *
@@ -506,10 +506,10 @@ $section = new Form_Section('Installation Feedback');
 
 $section->addInput(new Form_Checkbox(
 	'do_not_send_uniqueid',
-	'Netgate Device ID',
-	'Do NOT send Netgate Device ID with user agent',
+	'OpenSourceCompany Device ID',
+	'Do NOT send OpenSourceCompany Device ID with user agent',
 	$pconfig['do_not_send_uniqueid']
-))->setHelp('Enable this option to not send Netgate Device ID as part of User-Agent header.');
+))->setHelp('Enable this option to not send OpenSourceCompany Device ID as part of User-Agent header.');
 
 $form->add($section);
 

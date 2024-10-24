@@ -2,10 +2,10 @@
 /*
  * system_groupmanager_addprivs.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2006 Daniel S. Haischt.
  * All rights reserved.
  *
@@ -35,7 +35,7 @@
 ##|-PRIV
 
 require_once("guiconfig.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 $logging_level = LOG_WARNING;
 $logging_prefix = gettext("Local User Database");
@@ -49,7 +49,7 @@ init_config_arr(array('system', 'group', $groupid));
 $a_group = &$config['system']['group'][$groupid];
 
 if (!is_array($a_group)) {
-	pfSenseHeader("system_groupmanager.php?id={$groupid}");
+	libresenseHeader("system_groupmanager.php?id={$groupid}");
 	exit;
 }
 
@@ -64,7 +64,7 @@ uasort($spriv_list, "compare_by_name");
 /*
  * Check user privileges to test if the user is allowed to make changes.
  * Otherwise users can end up in an inconsistent state where some changes are
- * performed and others denied. See https://redmine.pfsense.org/issues/9259
+ * performed and others denied. See https://redmine.libresense.org/issues/9259
  */
 phpsession_begin();
 $guiuser = getUserEntry($_SESSION['Username']);
@@ -111,7 +111,7 @@ if ($_POST['save'] && !$read_only) {
 		write_config($savemsg);
 		syslog($logging_level, "{$logging_prefix}: {$savemsg}");
 
-		pfSenseHeader("system_groupmanager.php?act=edit&groupid={$groupid}");
+		libresenseHeader("system_groupmanager.php?act=edit&groupid={$groupid}");
 		exit;
 	}
 }
@@ -267,7 +267,7 @@ events.push(function() {
 				continue;
 			}
 
-			$desc = preg_replace("/pfSense/i", g_get('product_label'), $pdata['descr']);
+			$desc = preg_replace("/libresense/i", g_get('product_label'), $pdata['descr']);
 			if (isset($pdata['warn']) && ($pdata['warn'] == 'standard-warning-root')) {
 				$desc .= ' ' . gettext('(This privilege effectively gives administrator-level access to users in the group)');
 			}

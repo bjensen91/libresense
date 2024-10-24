@@ -2,8 +2,8 @@
 /*
  * auth_check.inc
  *
- * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2017-2023 Rubicon Communications, LLC (Netgate)
+ * part of libresense (https://www.libresense.org)
+ * Copyright (c) 2017-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ require_once("auth_func.inc");
 function session_read_single_var($varname) {
 	@phpsession_begin();
 	$result = $_SESSION[$varname];
-	// Perform a commit to avoid the session timing out prematurely. See https://redmine.pfsense.org/issues/8116
+	// Perform a commit to avoid the session timing out prematurely. See https://redmine.libresense.org/issues/8116
 	@phpsession_end(true);
 	return $result;
 }

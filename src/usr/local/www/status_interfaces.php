@@ -2,10 +2,10 @@
 /*
  * status_interfaces.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -34,7 +34,7 @@
 
 require_once("guiconfig.inc");
 require_once("interfaces.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("util.inc");
 
 global $config;
@@ -104,7 +104,7 @@ function showDefBtn($show, $term, $def, $ifdescr, $btnlbl, $chkbox_relinquish_le
 function dhcp_relinquish_lease($if, $ifdescr, $ipv) {
 	$leases_db = '/var/db/dhclient.leases.' . $if;
 	$conf_file = '/var/etc/dhclient_'.$ifdescr.'.conf';
-	$script_file = '/usr/local/sbin/pfSense-dhclient-script';
+	$script_file = '/usr/local/sbin/libresense-dhclient-script';
 	$ipv = ((int) $ipv == 6) ? '-6' : '-4';
 
 	if (file_exists($leases_db) && file_exists($script_file)) {

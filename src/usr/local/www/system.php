@@ -2,10 +2,10 @@
 /*
  * system.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -521,7 +521,7 @@ $section->addInput(new Form_Input(
 	'*Hostname',
 	'text',
 	$pconfig['hostname'],
-	['placeholder' => 'pfSense']
+	['placeholder' => 'libresense']
 ))->setHelp('Name of the firewall host, without domain part.');
 
 $section->addInput(new Form_Input(
@@ -743,7 +743,7 @@ $csswarning = sprintf(gettext("%sUser-created themes are unsupported, use at you
 events.push(function() {
 
 	function setThemeWarning() {
-		if ($('#webguicss').val().startsWith("pfSense")) {
+		if ($('#webguicss').val().startsWith("libresense")) {
 			$('#csstxt').html("").addClass("text-default");
 		} else {
 			$('#csstxt').html("<?=$csswarning?>").addClass("text-danger");

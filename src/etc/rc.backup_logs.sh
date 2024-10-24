@@ -2,9 +2,9 @@
 #
 # rc.backup_logs.sh
 #
-# part of pfSense (https://www.pfsense.org)
+# part of libresense (https://www.libresense.org)
 # Copyright (c) 2016 Electric Sheep Fencing
-# Copyright (c) 2016-2023 Rubicon Communications, LLC (Netgate)
+# Copyright (c) 2016-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # Based on src/etc/rc.d/savecore from FreeBSD

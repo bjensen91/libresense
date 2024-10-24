@@ -2,10 +2,10 @@
 /*
  * interfaces_assign.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -355,7 +355,7 @@ if (isset($_REQUEST['add']) && isset($_REQUEST['if_add'])) {
 			}
 		}
 		/* regenerated ruleset after re-assigning the interface,
-		 * see https://redmine.pfsense.org/issues/12949 */
+		 * see https://redmine.libresense.org/issues/12949 */
 		if ($filter_reload) {
 			filter_configure();
 		}
@@ -481,7 +481,7 @@ if (file_exists("/tmp/reload_interfaces")) {
 	print_apply_result_box($retval);
 }
 
-pfSense_handle_custom_code("/usr/local/pkg/interfaces_assign/pre_input_errors");
+libresense_handle_custom_code("/usr/local/pkg/interfaces_assign/pre_input_errors");
 
 if ($input_errors) {
 	print_input_errors($input_errors);

@@ -2,10 +2,10 @@
 /*
  * diag_packet_capture.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@
 require_once('util.inc');
 require_once('interfaces_fast.inc');
 require_once('guiconfig.inc');
-require_once('pfsense-utils.inc');
+require_once('libresense-utils.inc');
 require_once('live_logs.inc');
 require_once('diag_packet_capture.inc');
 

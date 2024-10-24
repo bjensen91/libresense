@@ -2,10 +2,10 @@
 /*
  * index.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Originally part of m0n0wall (http://m0n0.ch/wall)
@@ -137,7 +137,7 @@ if ((!empty($cpsession)) && (! $_POST['logout_id']) && (!empty($cpcfg['page']['l
 		<input name="logout" type="submit" value="<?= gettext("Disconnect") ?>" />
 	</form>
 	<br  />
-	<span> <i>Made with &hearts; by</i> <strong>Netgate</strong></span>
+	<span> <i>Made with &hearts; by</i> <strong>OpenSourceCompany</strong></span>
 	</div>
 </div>
 </body>
@@ -156,7 +156,7 @@ if ((!empty($cpsession)) && (! $_POST['logout_id']) && (!empty($cpcfg['page']['l
 }
 
 /* find MAC address for client */
-$tmpres = pfSense_ip_to_mac($clientip);
+$tmpres = libresense_ip_to_mac($clientip);
 if (!is_array($tmpres)) {
 	if (!isset($cpcfg['nomacfilter']) || isset($cpcfg['passthrumacadd'])) {
 		/* unable to find MAC address - shouldn't happen! - bail out */
@@ -198,7 +198,7 @@ if ($_POST['logout_id']) {
 	if (isset($_POST['auth_voucher'])) {
 		$voucher = trim($_POST['auth_voucher']);
 	} else {
-		/* submit voucher via URL, see https://redmine.pfsense.org/issues/1984 */
+		/* submit voucher via URL, see https://redmine.libresense.org/issues/1984 */
 		$voucher = trim($_GET['voucher']);
 		portal_reply_page($redirurl, "login", null, $clientmac, $clientip, null, null, $voucher);
 		return;

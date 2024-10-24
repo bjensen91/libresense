@@ -2,10 +2,10 @@
 /*
  * wizard.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +22,9 @@
  */
 
 ##|+PRIV
-##|*IDENT=page-pfsensewizardsubsystem
-##|*NAME=pfSense wizard subsystem
-##|*DESCR=Allow access to the 'pfSense wizard subsystem' page.
+##|*IDENT=page-libresensewizardsubsystem
+##|*NAME=libresense wizard subsystem
+##|*DESCR=Allow access to the 'libresense wizard subsystem' page.
 ##|*MATCH=wizard.php*
 ##|-PRIV
 
@@ -62,7 +62,7 @@ if (empty($xml)) {
 		die;
 	}
 	if (file_exists($wizard_full_path)) {
-		$pkg = parse_xml_config_pkg($wizard_full_path, "pfsensewizard");
+		$pkg = parse_xml_config_pkg($wizard_full_path, "libresensewizard");
 	} else {
 		print_info_box(sprintf(gettext("Could not open %s."), $xml), 'danger');
 		die;

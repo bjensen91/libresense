@@ -2,9 +2,9 @@
 #
 # read_xml_tag.sh
 #
-# part of pfSense (https://www.pfsense.org)
+# part of libresense (https://www.libresense.org)
 # Copyright (c) 2015-2016 Electric Sheep Fencing
-# Copyright (c) 2015-2023 Rubicon Communications, LLC (Netgate)
+# Copyright (c) 2015-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,9 +34,9 @@ if [ ! -f "$config" ]; then
 	exit 1
 fi
 
-# Get xml_rootobj, if not defined defaults to pfsense
+# Get xml_rootobj, if not defined defaults to libresense
 # Use php -n here because we are not ready to load extensions yet
-xml_rootobj=$(/usr/local/bin/php -n /usr/local/sbin/read_global_var xml_rootobj pfsense 2>/dev/null)
+xml_rootobj=$(/usr/local/bin/php -n /usr/local/sbin/read_global_var xml_rootobj libresense 2>/dev/null)
 
 /usr/local/bin/xmllint --xpath "${type}(//${xml_rootobj}/${path})" ${config} 2>/dev/null
 exit $?

@@ -2,9 +2,9 @@
 #
 # rc.php-fpm-restart
 #
-# part of pfSense (https://www.pfsense.org)
+# part of libresense (https://www.libresense.org)
 # Copyright (c) 2014-2016 Electric Sheep Fencing
-# Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+# Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # originally based on m0n0wall (http://neon1.net/m0n0wall)

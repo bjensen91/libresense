@@ -2,10 +2,10 @@
 /*
  * functions.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -34,7 +34,7 @@
 require_once("certs.inc");
 require_once("gwlb.inc");
 require_once("interfaces.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("services.inc");
 require_once("system.inc");
 

@@ -2,11 +2,11 @@
 /*
  * meta.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2008 Shrew Soft Inc
  * Copyright (c) 2008-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
  */
 
 /*
- * The meta data format used in pfSense is denoted using markers
+ * The meta data format used in libresense is denoted using markers
  * followed by the appropriate value or value pair. All markers
  * are prefixed with a ##| sequence. The + suffix is used to
  * denote the beginning of a tag block followed by the tag name.

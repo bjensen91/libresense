@@ -3,10 +3,10 @@
 /*
  * captiveportal_gather_stats.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2011 Warren Baker
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2013-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2013-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

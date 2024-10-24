@@ -2,10 +2,10 @@
 /*
  * status_logs_common.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -597,7 +597,7 @@ function status_logs_build_if_list() {
 	$iflist = get_configured_interface_with_descr(true);
 	//$iflist = get_interface_list();
 	// Allow extending of the firewall edit interfaces
-	pfSense_handle_custom_code("/usr/local/pkg/firewall_nat/pre_interfaces_edit");
+	libresense_handle_custom_code("/usr/local/pkg/firewall_nat/pre_interfaces_edit");
 	foreach ($iflist as $if => $ifdesc) {
 		$interfaces[$if] = $ifdesc;
 	}

@@ -3,7 +3,7 @@
 * r53.class for managing Amazon AWS Route53 Resources
 *
 * This is a simplified version of r53.class for trivial "dynDNS" operations
-* that integrates well with pfSense. Based on the original r53.class by
+* that integrates well with libresense. Based on the original r53.class by
 * Dan Myers at  http://sourceforge.net/projects/php-r53/ .
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Copyright (c) 2011, Dan Myers.

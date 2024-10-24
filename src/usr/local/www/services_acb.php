@@ -2,10 +2,10 @@
 /*
  * services_acb.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2008-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ $exp_sep = '||';
 // Encryption password
 $decrypt_password = config_get_path('system/acb/encryption_password');
 
-// Defined username. Username must be sent lowercase. See Redmine #7127 and Netgate Redmine #163
+// Defined username. Username must be sent lowercase. See Redmine #7127 and OpenSourceCompany Redmine #163
 $username = strtolower(config_get_path('system/acb/gold_username'));
 $password = config_get_path('system/acb/gold_password');
 
@@ -76,7 +76,7 @@ include("head.inc");
 
 if ($_REQUEST['rmver'] != "") {
 	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/rmbkp");
+	curl_setopt($curl_session, CURLOPT_URL, "https://acb.OpenSourceCompany.com/rmbkp");
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "userkey=" . $userkey .
 		"&revision=" . urlencode($_REQUEST['rmver']) .
 		"&version=" . g_get('product_version') .
@@ -91,11 +91,11 @@ if ($_REQUEST['rmver'] != "") {
 	$data = curl_exec($curl_session);
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/acb_deletedebug.txt", "w");
-		fwrite($fd, "https://acb.netgate.com/rmbkp" . "" . "action=delete&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['rmver']) . "\n\n");
+		fwrite($fd, "https://acb.OpenSourceCompany.com/rmbkp" . "" . "action=delete&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['rmver']) . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
 		fclose($fd);
-		$savemsg = "An error occurred while trying to remove the item from acb.netgate.com.";
+		$savemsg = "An error occurred while trying to remove the item from acb.OpenSourceCompany.com.";
 	} else {
 		curl_close($curl_session);
 		$budate = new DateTime($_REQUEST['rmver'], $acbtz);
@@ -108,7 +108,7 @@ if ($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
 
-	curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/getbkp");
+	curl_setopt($curl_session, CURLOPT_URL, "https://acb.OpenSourceCompany.com/getbkp");
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "userkey=" . $userkey .
 		"&revision=" . urlencode($_REQUEST['newver']) .
 		"&version=" . g_get('product_version') .
@@ -125,18 +125,18 @@ if ($_REQUEST['newver'] != "") {
 	$data = $data_split[1];
 
 	if (!tagfile_deformat($data, $data, "config.xml")) {
-		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+		$input_errors[] = "The downloaded file does not appear to contain an encrypted libresense configuration.";
 	}
 
 	$out = decrypt_data($data, $decrypt_password);
-	if (!strstr($out, "pfsense") ||
+	if (!strstr($out, "libresense") ||
 	    (strlen($out) < 50)) {
 		$out = "Could not decrypt. Different encryption key?";
 		$input_errors[] = "Could not decrypt config.xml. Check the encryption key and try again: {$out}";
 	} else {
-		$pos = stripos($out, "</pfsense>");
+		$pos = stripos($out, "</libresense>");
 		$data = substr($out, 0, $pos);
-		$data = $data . "</pfsense>\n";
+		$data = $data . "</libresense>\n";
 
 		$fd = fopen("/tmp/config_restore.xml", "w");
 		fwrite($fd, $data);
@@ -152,7 +152,7 @@ if ($_REQUEST['newver'] != "") {
 		if (curl_errno($curl_session)) {
 			/* If an error occurred, log the error in /tmp/ */
 			$fd = fopen("/tmp/acb_restoredebug.txt", "w");
-			fwrite($fd, "https://acb.netgate.com/getbkp" . "" . "action=restore&hostname={$hostname}&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
+			fwrite($fd, "https://acb.OpenSourceCompany.com/getbkp" . "" . "action=restore&hostname={$hostname}&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
 			fwrite($fd, $data);
 			fwrite($fd, curl_error($curl_session));
 			fclose($fd);
@@ -162,7 +162,7 @@ if ($_REQUEST['newver'] != "") {
 
 		if (!$input_errors && $data) {
 			if (config_restore("/tmp/config_restore.xml") == 0) {
-				$savemsg = "Successfully reverted the pfSense configuration to revision " . urldecode($_REQUEST['newver']) . ".";
+				$savemsg = "Successfully reverted the libresense configuration to revision " . urldecode($_REQUEST['newver']) . ".";
 				$savemsg .= <<<EOF
 			<br />
 		<form action="diag_reboot.php" method="post">
@@ -185,7 +185,7 @@ if ($_REQUEST['download']) {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
 
-	curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/getbkp");
+	curl_setopt($curl_session, CURLOPT_URL, "https://acb.OpenSourceCompany.com/getbkp");
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "userkey=" . $userkey . "&revision=" . urlencode($_REQUEST['download']));
 	curl_setopt($curl_session, CURLOPT_POST, 3);
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
@@ -198,7 +198,7 @@ if ($_REQUEST['download']) {
 
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/acb_backupdebug.txt", "w");
-		fwrite($fd, "https://acb.netgate.com/getbkp" . "" . "action=sgetbackup" . "\n\n");
+		fwrite($fd, "https://acb.OpenSourceCompany.com/getbkp" . "" . "action=sgetbackup" . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
 		fclose($fd);
@@ -207,7 +207,7 @@ if ($_REQUEST['download']) {
 	}
 
 	if (!tagfile_deformat($data, $data1, "config.xml")) {
-		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+		$input_errors[] = "The downloaded file does not appear to contain an encrypted libresense configuration.";
 	} else {
 		$ds = explode('++++', $data);
 		$revision = $_REQUEST['download'];
@@ -218,10 +218,10 @@ if ($_REQUEST['download']) {
 		$data = $ds[1];
 		$configtype = "Encrypted";
 		if (!tagfile_deformat($data, $data, "config.xml")) {
-			$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+			$input_errors[] = "The downloaded file does not appear to contain an encrypted libresense configuration.";
 		}
 		$data = decrypt_data($data, $decrypt_password);
-		if (!strstr($data, "pfsense")) {
+		if (!strstr($data, "libresense")) {
 			$data = "Could not decrypt. Different encryption key?";
 			$input_errors[] = "Could not decrypt config.xml. Check the encryption key and try again.";
 		}
@@ -234,7 +234,7 @@ if ((!($_REQUEST['download']) || $input_errors) && check_dnsavailable()) {
 	// Populate available backups
 	$curl_session = curl_init();
 
-	curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/list");
+	curl_setopt($curl_session, CURLOPT_URL, "https://acb.OpenSourceCompany.com/list");
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "userkey=" . $userkey .
 		"&uid=eb6a4e6f76c10734b636" .
 		"&version=" . g_get('product_version') .
@@ -251,7 +251,7 @@ if ((!($_REQUEST['download']) || $input_errors) && check_dnsavailable()) {
 
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/acb_backupdebug.txt", "w");
-		fwrite($fd, "https://acb.netgate.com/list" . "" . "action=showbackups" . "\n\n");
+		fwrite($fd, "https://acb.OpenSourceCompany.com/list" . "" . "action=showbackups" . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
 		fclose($fd);

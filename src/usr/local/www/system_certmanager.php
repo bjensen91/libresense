@@ -2,10 +2,10 @@
 /*
  * system_certmanager.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc
  * All rights reserved.
  *
@@ -31,7 +31,7 @@
 
 require_once("guiconfig.inc");
 require_once("certs.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 $cert_methods = array(
 	"internal" => gettext("Create an internal Certificate"),
@@ -106,7 +106,7 @@ if ((!empty($act) &&
     ($act != 'new') &&
     !$thiscert) ||
     (($act == 'del') && empty($_POST))) {
-	pfSenseHeader("system_certmanager.php");
+	libresenseHeader("system_certmanager.php");
 	exit;
 }
 
@@ -340,7 +340,7 @@ if ($_POST['save'] == gettext("Save")) {
 		/* Input validation for subjectAltNames */
 		foreach ($altnames as $idx => $altname) {
 			/* Skip SAN entries with empty values
-			 * https://redmine.pfsense.org/issues/14183
+			 * https://redmine.libresense.org/issues/14183
 			 */
 			if (empty($altname['value'])) {
 				unset($altnames[$idx]);
@@ -670,7 +670,7 @@ if ($_POST['save'] == gettext("Save")) {
 		$thiscert = $cert;
 		$savemsg = sprintf(gettext("Updated certificate signing request %s"), htmlspecialchars($pconfig['descr']));
 		write_config($savemsg);
-		pfSenseHeader("system_certmanager.php");
+		libresenseHeader("system_certmanager.php");
 	}
 }
 

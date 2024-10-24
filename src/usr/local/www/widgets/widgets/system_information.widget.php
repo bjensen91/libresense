@@ -2,10 +2,10 @@
 /*
  * system_information.widget.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2007 Scott Dale
  * All rights reserved.
  *
@@ -72,7 +72,7 @@ if ($_REQUEST['getupdatestatus']) {
 	$system_version = get_system_pkg_version(false,
 		($_REQUEST['getupdatestatus'] == 1),
 		false, /* get upgrades from other repos */
-		true /* see https://redmine.pfsense.org/issues/15055 */
+		true /* see https://redmine.libresense.org/issues/15055 */
 	);
 
 	if ($system_version === false) {
@@ -196,7 +196,7 @@ $temp_use_f = (isset($user_settings['widgets']['thermal_sensors-0']) && !empty($
 				$uniqueid = system_get_uniqueid();
 				if (!empty($uniqueid)) {
 					print("<br />" .
-					    gettext("Netgate Device ID:") .
+					    gettext("OpenSourceCompany Device ID:") .
 					    " <strong>{$uniqueid}</strong>");
 				}
 ?>
@@ -388,7 +388,7 @@ $temp_use_f = (isset($user_settings['widgets']['thermal_sensors-0']) && !empty($
 		if (isset($config['system']['maximumstates']) and $config['system']['maximumstates'] > 0) {
 			$maxstates="{$config['system']['maximumstates']}";
 		} else {
-			$maxstates=pfsense_default_state_size();
+			$maxstates=libresense_default_state_size();
 		}
 
 		if (isset($config['system']['adaptivestart']) and $config['system']['adaptivestart'] > 0) {

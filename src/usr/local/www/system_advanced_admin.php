@@ -2,10 +2,10 @@
 /*
  * system_advanced_admin.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc
  * All rights reserved.
  *
@@ -382,7 +382,7 @@ exec('/bin/kenv -q console 2>/dev/null', $current_consoles);
 $current_consoles = explode(',', $current_consoles[0]);
 /* The first console in the list is the current active primary console.
  * Use this as the default value if the user has not stored their own preference.
- * See https://redmine.pfsense.org/issues/12960
+ * See https://redmine.libresense.org/issues/12960
  */
 $active_primary = ($current_consoles[0] == 'comconsole') ? 'serial' : 'video';
 

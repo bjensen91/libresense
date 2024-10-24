@@ -19,7 +19,7 @@ for ($id=0; $id<count($a_gateways); $id++) {
 }
 $restartifs = array_unique($restartifs);
 
-// find gw interfaces pfsense names (wan, opt1, etc):
+// find gw interfaces libresense names (wan, opt1, etc):
 $names_restart = array();
 while ($int = current($config['interfaces'])) {
 	if (in_array($int['if'], $restartifs)) {

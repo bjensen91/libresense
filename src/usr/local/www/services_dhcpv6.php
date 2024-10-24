@@ -2,10 +2,10 @@
 /*
  * services_dhcpv6.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2010 Seth Mos <seth.mos@dds.nl>
  * All rights reserved.
  *
@@ -72,7 +72,7 @@ function dhcpv6_apply_changes($dhcpdv6_enable_changed) {
 	if (!function_exists('is_package_installed')) {
 		require_once('pkg-utils.inc');
 	}
-	if (is_package_installed('pfSense-pkg-bind') &&
+	if (is_package_installed('libresense-pkg-bind') &&
 	    config_path_enabled('installedpackages/bind/config/0', 'enable_bind')) {
 		$reloadbind = false;
 		$bindzone = config_get_path('installedpackages/bindzone/config', []);

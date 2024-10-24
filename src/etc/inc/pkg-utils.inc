@@ -2,11 +2,11 @@
 /*
  * pkg-utils.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2005-2006 Colin Smith (ethethlay@gmail.com)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ require_once("globals.inc");
 require_once("service-utils.inc");
 require_once("/usr/local/www/includes/functions.inc.php");
 require_once("xmlparse.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 if (!function_exists("pkg_debug")) {
 	/* set up logging if needed */
@@ -476,7 +476,7 @@ function get_pkg_info($pkgs = 'all', $remote_repo_usage_disabled = false,
 
 		/* XXX: Add it to globals.inc? */
 		$pkg_info['changeloglink'] =
-		    "https://github.com/pfsense/FreeBSD-ports/commits/devel/" .
+		    "https://github.com/libresense/FreeBSD-ports/commits/devel/" .
 		    $pkg_info['categories'][0] . '/' . $pkg_info['name'];
 
 		$pkg_is_installed = false;
@@ -724,7 +724,7 @@ function read_package_config($package_name) {
 		return false;
 	}
 
-	$pkg_info = parse_xml_config_pkg($pkg_info_xml, 'pfsensepkgs');
+	$pkg_info = parse_xml_config_pkg($pkg_info_xml, 'libresensepkgs');
 
 	if (empty($pkg_info)) {
 		return false;
@@ -1109,7 +1109,7 @@ function delete_package_xml($package_name, $when = "post-deinstall") {
 	if (is_array($pkg_info['logging']) && !empty($pkg_info['logging']['logfilename'])) {
 		update_status(gettext("Syslog entries... "));
 		/* remove package-related syslog configuration but retain log data,
-		 * see https://redmine.pfsense.org/issues/11846 */
+		 * see https://redmine.libresense.org/issues/11846 */
 		@unlink_if_exists("{$g['varetc_path']}/syslog.d/" . basename($pkg_info['logging']['logfilename']) . ".conf");
 		update_status("done.\n");
 		$need_syslog_restart = true;
@@ -1189,7 +1189,7 @@ function package_reinstall_all() {
 				$found = true;
 			} elseif ($pkg['name'] == $package['name']) {
 				/* some packages use 'name' as the package name,
-				 * see https://redmine.pfsense.org/issues/12766 */
+				 * see https://redmine.libresense.org/issues/12766 */
 				pkg_install(g_get('pkg_prefix') . $package['name'], true);
 				$found = true;
 			}
@@ -1241,7 +1241,7 @@ function stop_packages() {
 	require_once("shaper.inc");
 	require_once("captiveportal.inc");
 	require_once("pkg-utils.inc");
-	require_once("pfsense-utils.inc");
+	require_once("libresense-utils.inc");
 	require_once("service-utils.inc");
 
 	log_error(gettext("Stopping all packages."));
@@ -1347,7 +1347,7 @@ function get_system_pkg_version($baseonly = false, $use_cache = true, $updates_o
 		}
 	}
 
-	/* pfSense-upgrade returns 2 when there is a new version */
+	/* libresense-upgrade returns 2 when there is a new version */
 	if ($rc == "2") {
 		$new_version = explode(' ', $output)[0];
 	}
@@ -1498,7 +1498,7 @@ function pkg_switch_repo($repo_path, $repo_name) {
 	/* Do not fetch new settings, only setup the repo pkg.conf. */
 	mwexec("/usr/local/sbin/{$g['product_name']}-repo-setup -U");
 
-	/* Update pfSense_version cache */
+	/* Update libresense_version cache */
 	mwexec_bg("/etc/rc.update_pkg_metadata now");
 	return;
 }
@@ -1517,7 +1517,7 @@ function update_repos() {
 	/* Default error message for failure cases. */
 	$fail_error = [
 		"error" => 1,
-		"messages" => ["Could not update connect to Netgate servers. Please try again later."]
+		"messages" => ["Could not update connect to OpenSourceCompany servers. Please try again later."]
 	];
 
 	/* Execute repoc with a full pkg style environment, including proxy

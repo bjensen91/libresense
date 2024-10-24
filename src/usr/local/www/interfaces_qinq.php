@@ -2,10 +2,10 @@
 /*
  * interfaces_qinq.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,7 +61,7 @@ if ($_POST['act'] == "del") {
 		foreach ($delmembers as $tag) {
 			exec("/sbin/ifconfig {$qinq['vlanif']}.{$tag} destroy");
 		}
-		pfSense_interface_destroy($qinq['vlanif']);
+		libresense_interface_destroy($qinq['vlanif']);
 		unset($a_qinqs[$id]);
 
 		write_config("QinQ interface deleted");

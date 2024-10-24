@@ -2,10 +2,10 @@
 /*
  * system_groupmanager.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2005 Paul Taylor <paultaylor@winn-dixie.com>
  * Copyright (c) 2008 Shrew Soft Inc
  * All rights reserved.
@@ -36,7 +36,7 @@
 ##|-PRIV
 
 require_once("guiconfig.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 $logging_level = LOG_WARNING;
 $logging_prefix = gettext("Local User Database");
@@ -72,7 +72,7 @@ function admin_groups_sort() {
 /*
  * Check user privileges to test if the user is allowed to make changes.
  * Otherwise users can end up in an inconsistent state where some changes are
- * performed and others denied. See https://redmine.pfsense.org/issues/9259
+ * performed and others denied. See https://redmine.libresense.org/issues/9259
  */
 phpsession_begin();
 $guiuser = getUserEntry($_SESSION['Username']);
@@ -88,7 +88,7 @@ if (($_POST['act'] == "delgroup") && !$read_only) {
 	if (!isset($id) || !isset($_REQUEST['groupname']) ||
 	    !isset($a_group[$id]) ||
 	    ($_REQUEST['groupname'] != $a_group[$id]['name'])) {
-		pfSenseHeader("system_groupmanager.php");
+		libresenseHeader("system_groupmanager.php");
 		exit;
 	}
 
@@ -97,7 +97,7 @@ if (($_POST['act'] == "delgroup") && !$read_only) {
 	unset($a_group[$id]);
 	/*
 	 * Reindex the array to avoid operating on an incorrect index
-	 * https://redmine.pfsense.org/issues/7733
+	 * https://redmine.libresense.org/issues/7733
 	 */
 	$a_group = array_values($a_group);
 
@@ -110,7 +110,7 @@ if (($_POST['act'] == "delgroup") && !$read_only) {
 if (($_POST['act'] == "delpriv") && !$read_only && ($dup === null)) {
 
 	if (!isset($id) || !isset($a_group[$id])) {
-		pfSenseHeader("system_groupmanager.php");
+		libresenseHeader("system_groupmanager.php");
 		exit;
 	}
 
@@ -173,7 +173,7 @@ if (isset($_POST['dellall_x']) && !$read_only) {
 		    implode(', ', $deleted_groups));
 		/*
 		 * Reindex the array to avoid operating on an incorrect index
-		 * https://redmine.pfsense.org/issues/7733
+		 * https://redmine.libresense.org/issues/7733
 		 */
 		$a_group = array_values($a_group);
 		write_config($savemsg);

@@ -2,10 +2,10 @@
 /*
  * head.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ if ($user_settings['webgui']['pagenamefirst']) {
 	$tabtitle = htmlspecialchars($system_url) . " - " . $pagetitle;
 }
 
-$cssfile = "/css/pfSense.css";
+$cssfile = "/css/libresense.css";
 
 if (isset($user_settings['webgui']['webguicss'])) {
 	if (file_exists("/usr/local/www/css/" . $user_settings['webgui']['webguicss'])) {
@@ -182,7 +182,7 @@ function return_ext_menu($section) {
 			$colonpos = strpos($addresswithport, ":");
 
 			if ($colonpos !== false) {
-				//my url is actually just the IP address of the pfsense box
+				//my url is actually just the IP address of the libresense box
 				$myurl = substr($addresswithport, 0, $colonpos);
 			} else {
 				$myurl = $addresswithport;
@@ -438,18 +438,18 @@ $diagnostics_menu = msort(array_merge($diagnostics_menu, return_ext_menu("Diagno
 if (!g_get('disablehelpmenu')) {
 	$help_menu = array();
 	$help_menu[] = array(gettext("About this Page"), $helpurl);
-	if (g_get('product_name') == "pfSense") {
-		$help_menu[] = array(gettext("Bug Database"), "https://redirects.netgate.com/issues");
+	if (g_get('product_name') == "libresense") {
+		$help_menu[] = array(gettext("Bug Database"), "https://redirects.OpenSourceCompany.com/issues");
 	}
 
-	$help_menu[] = array(gettext("User Forum"), "https://redirects.netgate.com/forum");
-	$help_menu[] = array(gettext("Documentation"), "https://redirects.netgate.com/docs");
-	$help_menu[] = array(gettext("Paid Support"), "https://redirects.netgate.com/support");
-	$help_menu[] = array(gettext("pfSense Book"), "https://redirects.netgate.com/book");
-	$help_menu[] = array(gettext("FreeBSD Handbook"), "https://redirects.netgate.com/fbsdhandbook");
-	$help_menu[] = array(gettext("User survey"), "https://redirects.netgate.com/survey_1");
+	$help_menu[] = array(gettext("User Forum"), "https://redirects.OpenSourceCompany.com/forum");
+	$help_menu[] = array(gettext("Documentation"), "https://redirects.OpenSourceCompany.com/docs");
+	$help_menu[] = array(gettext("Paid Support"), "https://redirects.OpenSourceCompany.com/support");
+	$help_menu[] = array(gettext("libresense Book"), "https://redirects.OpenSourceCompany.com/book");
+	$help_menu[] = array(gettext("FreeBSD Handbook"), "https://redirects.OpenSourceCompany.com/fbsdhandbook");
+	$help_menu[] = array(gettext("User survey"), "https://redirects.OpenSourceCompany.com/survey_1");
 	if  (strpos(g_get('product_label'), 'Plus') === false) {
-		$help_menu[] = array(gettext("Upgrade to pfSense Plus"), "https://redirects.netgate.com/upgrade");
+		$help_menu[] = array(gettext("Upgrade to libresense Plus"), "https://redirects.OpenSourceCompany.com/upgrade");
 	}
 	$help_menu = msort(array_merge($help_menu, return_ext_menu("Help")), 0);
 }

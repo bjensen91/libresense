@@ -2,10 +2,10 @@
 /*
  * autoconfigbackup_settings.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -34,7 +34,7 @@
 
 require_once("guiconfig.inc");
 require_once("functions.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("services.inc");
 require_once("acb.inc");
 
@@ -120,7 +120,7 @@ $section->addInput(new Form_Checkbox(
 	'Enable automatic configuration backups',
 	($pconfig['enable'] == "yes")
 ))->setHelp("Auto Configuration Backup automatically encrypts configuration backup content using the " .
-	    "Encryption Password below and then securely uploads the encrypted backup over HTTPS to Netgate servers.");
+	    "Encryption Password below and then securely uploads the encrypted backup over HTTPS to OpenSourceCompany servers.");
 
 $group = new Form_MultiCheckboxGroup('Backup Frequency');
 
@@ -198,7 +198,7 @@ $section->addInput(new Form_Input(
 	'text',
 	$pconfig['hint']
 ))->setHelp("You may optionally provide an identifier which will be stored in plain text along with each encrypted backup. " .
-			"This may allow the Netgate support team to locate your key should you lose it.");
+			"This may allow the OpenSourceCompany support team to locate your key should you lose it.");
 
 $section->addInput(new Form_Input(
 	'numman',

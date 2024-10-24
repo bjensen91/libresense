@@ -2,10 +2,10 @@
 /*
  * util.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -596,7 +596,7 @@ function ip_range_to_address_array($startip, $endip, $max_size = 5000) {
  * Convert an IPv4 or IPv6 IP range to an array of subnets which can contain the range.
  * Algorithm and embodying code PD'ed by Stilez - enjoy as you like :-)
  *
- * Documented on pfsense dev list 19-20 May 2013. Summary:
+ * Documented on libresense dev list 19-20 May 2013. Summary:
  *
  * The algorithm looks at patterns of 0's and 1's in the least significant bit(s), whether IPv4 or IPv6.
  * These are all that needs checking to identify a _guaranteed_ correct, minimal and optimal subnet array.
@@ -765,7 +765,7 @@ function is_ipaddrv6($ipaddr) {
 	/*
 	 * Net_IPv6::checkIPv6 does not reject multiple attempts at compression
 	 * so we must check it beforehand.
-	 * https://redmine.pfsense.org/issues/13069
+	 * https://redmine.libresense.org/issues/13069
 	 */
 	if (substr_count($ipaddr, '::') > 1) {
 		return false;
@@ -775,7 +775,7 @@ function is_ipaddrv6($ipaddr) {
 
 function is_ipaddrv6_v4map($ipaddr) {
 	/* check RFC4291 par 2.2.2 format, ex: fd00::1.2.3.4
-	 * see https://redmine.pfsense.org/issues/11446 */
+	 * see https://redmine.libresense.org/issues/11446 */
 	if (is_ipaddrv6($ipaddr) && preg_match('/^[0-9a-f:]{2,30}[0-9.]{7,15}$/i', $ipaddr)) {
 		return true;
 	}
@@ -1109,7 +1109,7 @@ function get_v6_ptr_zones($subnet, $bits) {
 function ip_in_subnet($addr, $subnet) {
 	if (is_ipaddrv6($addr) && is_subnetv6($subnet)) {
 		/* Normalize IPv6 prefix to its start address to avoid PHP errors
-		 * https://redmine.pfsense.org/issues/14256
+		 * https://redmine.libresense.org/issues/14256
 		 */
 		list($prefix, $length) = explode("/", $subnet);
 		$prefix = gen_subnetv6($prefix, $length);
@@ -1813,10 +1813,10 @@ function get_interface_list($mode = "active", $keyby = "physical", $vfaces = fal
 	}
 	switch ($mode) {
 		case "active":
-			$upints = pfSense_interface_listget(IFF_UP);
+			$upints = libresense_interface_listget(IFF_UP);
 			break;
 		case "media":
-			$intlist = pfSense_interface_listget();
+			$intlist = libresense_interface_listget();
 			$ifconfig = [];
 			exec("/sbin/ifconfig -a", $ifconfig);
 			$ifstatus = preg_grep('/status:/', $ifconfig);
@@ -1828,7 +1828,7 @@ function get_interface_list($mode = "active", $keyby = "physical", $vfaces = fal
 			}
 			break;
 		default:
-			$upints = pfSense_interface_listget();
+			$upints = libresense_interface_listget();
 			break;
 	}
 	/* build interface list with netstat */
@@ -2614,7 +2614,7 @@ function is_interface_mismatch() {
 	}
 
 	/* VLAN/QinQ-only interface mismatch detection
-	 * see https://redmine.pfsense.org/issues/12170 */
+	 * see https://redmine.libresense.org/issues/12170 */
 	init_config_arr(array('vlans', 'vlan'));
 	foreach ($config['vlans']['vlan'] as $vlan) {
 		if (!does_interface_exist($vlan['if']) &&
@@ -2906,7 +2906,7 @@ function is_dynamic_route(string $target, string $ipprotocol = ''): bool {
 	}
 
 	/* check for the PROTO* flag instead of STATIC
-	 * see https://redmine.pfsense.org/issues/14717
+	 * see https://redmine.libresense.org/issues/14717
 	 * mwexec() returns false if the flag exists, so invert it */
 	if (!mwexec("/sbin/route -n{$inet} get " . escapeshellarg($target) . " 2>/dev/null | /usr/bin/egrep 'flags: <.*PROTO.*>'")) {
 		return true;
@@ -3081,7 +3081,7 @@ function route_add_or_change($target, $gw, $iface = '', $args = '',
 		return false;
 	}
 
-	/* use '-host' for IPv6 /128 routes, see https://redmine.pfsense.org/issues/11594 */
+	/* use '-host' for IPv6 /128 routes, see https://redmine.libresense.org/issues/11594 */
 	if (is_subnetv4($target) || (is_subnetv6($target) && (subnet_size($target) > 1))) {
 		$target_prefix = '-net';
 	} else if (is_ipaddr($target)) {
@@ -3105,8 +3105,8 @@ function route_add_or_change($target, $gw, $iface = '', $args = '',
 	}
 	if (is_ipaddr($gw)) {
 		/* set correct linklocal gateway address,
-		 * see https://redmine.pfsense.org/issues/11713
-		 * and https://redmine.pfsense.org/issues/11806 */
+		 * see https://redmine.libresense.org/issues/11713
+		 * and https://redmine.libresense.org/issues/11806 */
 		if (is_ipaddrv6($gw) && is_linklocal($gw) && empty(get_ll_scope($gw))) {
 			$routeget = route_get($gw, 'inet6', true);
 			$gw .= "%" . $routeget[0]['interface-name'];
@@ -3259,7 +3259,7 @@ function get_alias_list($type = null) {
 
 /* Returns the current alias contents sorted by name in case insensitive and
  * natural order.
- * https://redmine.pfsense.org/issues/14015 */
+ * https://redmine.libresense.org/issues/14015 */
 function get_sorted_aliases() {
 	$aliases = config_get_path('aliases/alias', []);
 	uasort($aliases, function ($a, $b) { return strnatcasecmp($a['name'], $b['name']); });
@@ -3310,7 +3310,7 @@ function post_redirect($page, $params) {
 /* Locate disks that can be queried for S.M.A.R.T. data. */
 function get_smart_drive_list() {
 	/* SMART supports some disks directly, and some controllers directly,
-	 * See https://redmine.pfsense.org/issues/9042 */
+	 * See https://redmine.libresense.org/issues/9042 */
 	$supported_disk_types = array("ad", "da", "ada");
 	$supported_controller_types = array("nvme");
 	$disk_list = explode(" ", get_single_sysctl("kern.disks"));
@@ -3411,7 +3411,7 @@ function validateipaddr(&$addr, $type, $label, &$err_msg, $alias=false) {
  * 2) Replace any remaining "-" with ":".
  * 3) If any components are input with just a single char (hex digit hopefully), put a "0" in front.
  * 4) The first two components should be a 16-bit integer (little- or big-endian, depending on the current machine type) that
- *    is equal to the number of other components. If not, prepend this as "nn:00" (all pfSense builds are little-endian).
+ *    is equal to the number of other components. If not, prepend this as "nn:00" (all libresense builds are little-endian).
  *    This is convenience, because the DUID reported by dhcp6c in logs does not include this count, which corresponds to the
  *    option-len field of DHCPv6's OPTION_CLIENTID option.
  *
@@ -4130,7 +4130,7 @@ function pconfig_to_address(&$adr, $padr, $pmask, $pnot = false, $pbeginport = 0
 	/*
 	 * If the port is still unset, then it must not be numeric, but could
 	 * be an alias or a well-known/registered service.
-	 * See https://redmine.pfsense.org/issues/8410
+	 * See https://redmine.libresense.org/issues/8410
 	 */
 	if (!isset($adr['port']) && is_port_or_alias($pbeginport)) {
 		$adr['port'] = $pbeginport;

@@ -2,10 +2,10 @@
 /*
  * guiconfig.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -31,7 +31,7 @@ header("X-Frame-Options: SAMEORIGIN");
 include_once('phpsessionmanager.inc');
 include_once("util.inc");
 
-function pfSense_csrf_callback() {
+function libresense_csrf_callback() {
 	include "csrf_error.php";
 }
 
@@ -39,11 +39,11 @@ if (!$nocsrf) {
 	function csrf_startup() {
 		csrf_conf('rewrite-js', '/csrf/csrf-magic.js');
 		/* Loading the configuration to get this value breaks other
-		 * functions. See https://redmine.pfsense.org/issues/13757 */
+		 * functions. See https://redmine.libresense.org/issues/13757 */
 		// $timeout_minutes = config_get_path('system/webgui/session_timeout', 240);
 		$timeout_minutes = 240;
 		csrf_conf('expires', $timeout_minutes * 60);
-		csrf_conf('callback', 'pfSense_csrf_callback');
+		csrf_conf('callback', 'libresense_csrf_callback');
 	}
 	require_once("csrf/csrf-magic.php");
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -61,7 +61,7 @@ if (!$omit_nocacheheaders) {
 
 require_once("authgui.inc");
 /* Load config.inc after authgui.inc
- * See https://redmine.pfsense.org/issues/13757 */
+ * See https://redmine.libresense.org/issues/13757 */
 include_once('config.inc');
 include_once('config.lib.inc');
 
@@ -79,7 +79,7 @@ $mandfldhtml = "";		/* display this before mandatory input fields */
 $mandfldhtmlspc = "";	/* same as above, but with spacing */
 
 if (!function_exists('set_language')) {
-	require_once("pfsense-utils.inc");
+	require_once("libresense-utils.inc");
 }
 
 set_language();
@@ -803,7 +803,7 @@ function echo_array($array, $return_me = false) {
 	}
 }
 
-/****f* pfsense-utils/display_top_tabs
+/****f* libresense-utils/display_top_tabs
  * NAME
  *	 display_top_tabs - display tabs with rounded edges
  * INPUTS
@@ -986,7 +986,7 @@ function gateway_info_popup($showgw, $gateways_status = false) {
 	$a_gateways = return_gateways_array(true, false, true, false);
 
 	/* Use cached gateway status if available.
-	 * See https://redmine.pfsense.org/issues/12174 */
+	 * See https://redmine.libresense.org/issues/12174 */
 	if (!is_array($gateways_status)) {
 		$gateways_status = return_gateways_status(true);
 	}

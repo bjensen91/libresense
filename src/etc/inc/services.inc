@@ -2,10 +2,10 @@
 /*
  * services.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -289,7 +289,7 @@ function services_radvd_configure($blacklist = array()) {
 					 * The value of Lifetime SHOULD by default be at least
 					 * 3 * MaxRtrAdvInterval, where MaxRtrAdvInterval is the
 					 * maximum RA interval as defined in [RFC4861].
-					 * see https://redmine.pfsense.org/issues/11105
+					 * see https://redmine.libresense.org/issues/11105
 					 */
 					$radvdconf .= "\tRDNSS {$dnsstring} {\n";
 					$radvdconf .= "\t\tAdvRDNSSLifetime {$raadvdnsslifetime};\n";
@@ -314,7 +314,7 @@ function services_radvd_configure($blacklist = array()) {
 			if (!empty($dhcpv6ifconf['domain'])) {
 				/*
 				 * Lifetime SHOULD by default be at least 3 * MaxRtrAdvInterval
-				 * see https://redmine.pfsense.org/issues/12173
+				 * see https://redmine.libresense.org/issues/12173
 				 */
 				$radvdconf .= "\tDNSSL {$dhcpv6ifconf['domain']} {$searchliststring} {\n";
 				$radvdconf .= "\t\tAdvDNSSLLifetime {$raadvdnsslifetime};\n";
@@ -1135,8 +1135,8 @@ function services_kea4_configure()
 	}
 
 	/* take these settings from the first DHCP configured interface,
-	 * see https://redmine.pfsense.org/issues/10270
-	 * TODO: Global Settings tab, see https://redmine.pfsense.org/issues/5080 */
+	 * see https://redmine.libresense.org/issues/10270
+	 * TODO: Global Settings tab, see https://redmine.libresense.org/issues/5080 */
 	foreach ($dhcpdcfg as $dhcpif => $dhcpifconf) {
 		if (empty($dhcpifconf)) {
 			continue;
@@ -2207,8 +2207,8 @@ update-conflict-detection false;
 EOD;
 
 	/* take these settings from the first DHCP configured interface,
-	 * see https://redmine.pfsense.org/issues/10270
-	 * TODO: Global Settings tab, see https://redmine.pfsense.org/issues/5080 */
+	 * see https://redmine.libresense.org/issues/10270
+	 * TODO: Global Settings tab, see https://redmine.libresense.org/issues/5080 */
 	foreach ($dhcpdcfg as $dhcpif => $dhcpifconf) {
 		if (empty($dhcpifconf)) {
 			continue;
@@ -4154,7 +4154,7 @@ function services_dnsmasq_configure($restart_dhcp = true) {
 		if (config_path_enabled('dnsmasq','no_private_reverse')) {
 			/* Note: Carrier Grade NAT (CGN) addresses 100.64.0.0/10 are intentionally not here. */
 			/* End-users should not be aware of CGN addresses, so reverse lookups for these should not happen. */
-			/* Just the pfSense WAN might get a CGN address from an ISP. */
+			/* Just the libresense WAN might get a CGN address from an ISP. */
 
 			// Build an array of domain overrides to help in checking for matches.
 			$override_a = array();
@@ -4188,7 +4188,7 @@ function services_dnsmasq_configure($restart_dhcp = true) {
 		}
 
 		/* avoid 127.0.0.1 dns loop,
-		 * see https://redmine.pfsense.org/issues/12902 */
+		 * see https://redmine.libresense.org/issues/12902 */
 		$args .= ' --no-resolv';
 		foreach (get_dns_nameservers(false, true) as $dns) {
 			if ($dns != '127.0.0.1') {
@@ -4441,7 +4441,7 @@ function services_snmpd_configure($interface='') {
 			echo gettext("Starting SNMP daemon... ");
 		}
 
-		/* Make sure a printcap file exists or else bsnmpd will log errors. See https://redmine.pfsense.org/issues/6838 */
+		/* Make sure a printcap file exists or else bsnmpd will log errors. See https://redmine.libresense.org/issues/6838 */
 		if (!file_exists('/etc/printcap')) {
 			@file_put_contents('/etc/printcap', "# Empty file to prevent bsnmpd from logging errors.\n");
 		}
@@ -4489,7 +4489,7 @@ EOD;
 			" " . php_uname("r") . " " . php_uname("m");
 
 		$snmpdconf .= <<<EOD
-system := 1     # pfSense
+system := 1     # libresense
 %snmpd
 sysDescr			= "{$sysDescr}"
 begemotSnmpdDebugDumpPdus       = 2
@@ -4946,7 +4946,7 @@ function configure_cron() {
 
 	if (!empty(config_get_path('cron/item', []))) {
 		$crontab_contents .= "#\n";
-		$crontab_contents .= "# pfSense specific crontab entries\n";
+		$crontab_contents .= "# libresense specific crontab entries\n";
 		$crontab_contents .= "# " .gettext("Created:") . " " . date("F j, Y, g:i a") . "\n";
 		$crontab_contents .= "#\n";
 		$crontab_contents .= "SHELL=/bin/sh\n";

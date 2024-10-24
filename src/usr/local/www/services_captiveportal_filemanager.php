@@ -2,10 +2,10 @@
 /*
  * services_captiveportal_filemanager.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2005-2006 Jonathan De Graeve (jonathan.de.graeve@imelda.be)
  * Copyright (c) 2005-2006 Paul Taylor (paultaylor@winn-dixie.com)
  * All rights reserved.

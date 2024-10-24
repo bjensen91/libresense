@@ -2,10 +2,10 @@
 /*
  * interfaces_wireless.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2010 Erik Fonnesbeck
  * All rights reserved.
  *
@@ -53,7 +53,7 @@ if ($_POST['act'] == "del") {
 	if (clone_inuse($_POST['id'])) {
 		$input_errors[] = gettext("This wireless clone cannot be deleted because it is assigned as an interface.");
 	} else {
-		pfSense_interface_destroy($a_clones[$_POST['id']]['cloneif']);
+		libresense_interface_destroy($a_clones[$_POST['id']]['cloneif']);
 		unset($a_clones[$_POST['id']]);
 
 		write_config("Wireless interface deleted");

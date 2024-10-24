@@ -2,10 +2,10 @@
 /*
  * interfaces_vlan_edit.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -52,7 +52,7 @@ foreach ($lagglist as $lagg) {
 }
 
 /* Do not allow OpenVPN TUN interfaces to be used for QinQ
- * https://redmine.pfsense.org/issues/11675 */
+ * https://redmine.libresense.org/issues/11675 */
 init_config_arr(array('openvpn', 'openvpn-server'));
 init_config_arr(array('openvpn', 'openvpn-client'));
 foreach ($portlist as $portname => $port) {
@@ -131,9 +131,9 @@ if ($_POST['save']) {
 				if (!empty($a_vlans[$id]['vlanif'])) {
 					$confif = convert_real_interface_to_friendly_interface_name($a_vlans[$id]['vlanif']);
 					// Destroy previous vlan
-					pfSense_interface_destroy($a_vlans[$id]['vlanif']);
+					libresense_interface_destroy($a_vlans[$id]['vlanif']);
 				} else {
-					pfSense_interface_destroy(vlan_interface($a_vlans[id]));
+					libresense_interface_destroy(vlan_interface($a_vlans[id]));
 					$confif = convert_real_interface_to_friendly_interface_name(vlan_interface($a_vlans[$id]));
 				}
 				if ($confif != "") {
@@ -149,7 +149,7 @@ if ($_POST['save']) {
 		$vlan['vlanif'] = vlan_interface($_POST);
 		$vlanif = interface_vlan_configure($vlan);
 		if ($vlanif == NULL || $vlanif != $vlan['vlanif']) {
-			pfSense_interface_destroy($vlan['vlanif']);
+			libresense_interface_destroy($vlan['vlanif']);
 			$input_errors[] = gettext("Error occurred creating interface, please retry.");
 		} else {
 			if (isset($id) && $a_vlans[$id]) {

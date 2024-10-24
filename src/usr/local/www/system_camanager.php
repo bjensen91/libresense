@@ -2,10 +2,10 @@
 /*
  * system_camanager.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc
  * All rights reserved.
  *
@@ -31,7 +31,7 @@
 
 require_once("guiconfig.inc");
 require_once("certs.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 $ca_methods = array(
 	"internal" => gettext("Create an internal Certificate Authority"),
@@ -71,7 +71,7 @@ if ((!empty($act) &&
     ($act != 'new') &&
     !$thisca) ||
     (($act == 'del') && empty($_POST))) {
-	pfSenseHeader("system_camanager.php");
+	libresenseHeader("system_camanager.php");
 	exit;
 }
 
@@ -167,7 +167,7 @@ if ($_POST['save']) {
 				$input_errors[] = gettext("The submitted private key does not match the submitted certificate data.");
 			}
 			/* we must ensure the certificate is capable of acting as a CA
-			 * https://redmine.pfsense.org/issues/7885
+			 * https://redmine.libresense.org/issues/7885
 			 */
 			if (!$input_errors) {
 				$purpose = cert_get_purpose($_POST['cert'], false);
@@ -340,7 +340,7 @@ if ($_POST['save']) {
 		if (!$input_errors) {
 			write_config($savemsg);
 			ca_setup_trust_store();
-			pfSenseHeader("system_camanager.php");
+			libresenseHeader("system_camanager.php");
 		}
 	}
 }

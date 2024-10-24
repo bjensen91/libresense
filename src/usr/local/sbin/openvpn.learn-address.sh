@@ -53,7 +53,7 @@ if [ -n "${IP}" -a "$(/usr/bin/basename ${IP})" = "${IP}" ]; then
 				/bin/chmod 644 "${TMPCONF}" "${TMPSRV}"
 				/usr/local/sbin/unbound-checkconf "${TMPSRV}" && /bin/mv "${TMPCONF}" "${CONF}"
 
-				# do not restart unbound on connect, see https://redmine.pfsense.org/issues/11129
+				# do not restart unbound on connect, see https://redmine.libresense.org/issues/11129
 				/usr/bin/su -m unbound -c "/usr/local/sbin/unbound-control -c /var/unbound/unbound.conf local_data ${CN}.${DOMAIN} ${ARECORD} ${IP}"
 				/usr/bin/su -m unbound -c "/usr/local/sbin/unbound-control -c /var/unbound/unbound.conf local_data ${CN} ${ARECORD} ${IP}"
 				/usr/bin/su -m unbound -c "/usr/local/sbin/unbound-control -c /var/unbound/unbound.conf local_data ${PTRRECORD} PTR ${CN}.${DOMAIN}"

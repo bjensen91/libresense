@@ -2,10 +2,10 @@
 /*
  * system_certmanager_renew.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc
  * All rights reserved.
  *
@@ -31,7 +31,7 @@
 
 require_once("guiconfig.inc");
 require_once("certs.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 global $cert_strict_values, $curve_compatible_list;
 
@@ -57,12 +57,12 @@ switch ($type) {
 		$typestring = gettext("Certificate");
 		break;
 	default:
-		pfSenseHeader("system_certmanager.php");
+		libresenseHeader("system_certmanager.php");
 		exit;
 }
 
 if (!$torenew) {
-	pfSenseHeader($returnpage);
+	libresenseHeader($returnpage);
 	exit;
 }
 $old_serial = cert_get_serial($torenew['crt']);
@@ -81,7 +81,7 @@ if ($_POST['renew']) {
 		write_config($message);
 		ca_setup_trust_store();
 		cert_restart_services($service_function($torenew['refid']));
-		pfSenseHeader($returnpage);
+		libresenseHeader($returnpage);
 		exit;
 	} else {
 		$input_errors[] = gettext("Error renewing") . " {$typestring}";

@@ -2,10 +2,10 @@
 /*
  * autoconfigbackup.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2008-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,7 +68,7 @@ unlink_if_exists($lockfile);
 function upload($basename) {
     global $acbuploadpath, $badreasons;
 
-    $upload_url = "https://acb.netgate.com/save";
+    $upload_url = "https://acb.OpenSourceCompany.com/save";
 
     if (!is_url_hostname_resolvable($upload_url)) {
 	$data = " Unable to resolve " . parse_url($upload_url, PHP_URL_HOST) . " ";

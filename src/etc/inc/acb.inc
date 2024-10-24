@@ -2,10 +2,10 @@
 /*
  * autoconfigbackup.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2008-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -145,7 +145,7 @@ function test_connection($post) {
 	// Encryption password
 	$decrypt_password = $post['crypto_password'];
 
-	// Defined username. Username must be sent lowercase. See Redmine #7127 and Netgate Redmine #163
+	// Defined username. Username must be sent lowercase. See Redmine #7127 and OpenSourceCompany Redmine #163
 	$username = strtolower($post['username']);
 
 	// Defined password
@@ -155,7 +155,7 @@ function test_connection($post) {
 	$hostname = $config['system']['hostname'] . "." . $config['system']['domain'];
 
 	// URL to restore.php
-	$get_url = "https://acb.netgate.com/getbkp";
+	$get_url = "https://acb.OpenSourceCompany.com/getbkp";
 
 	// Populate available backups
 	$curl_session = curl_init();
@@ -198,7 +198,7 @@ function upload_config($manual = false) {
 	}
 
 	/*
-	 * pfSense upload config to acb.netgate.com script
+	 * libresense upload config to acb.OpenSourceCompany.com script
 	 * This file plugs into config.inc (/usr/local/pkg/parse_config)
 	 * and runs every time the running firewall filter changes.
 	 *
@@ -231,7 +231,7 @@ function upload_config($manual = false) {
 	$encryptpw = config_get_path('system/acb/encryption_password');
 
 	// Define upload_url, must be present after other variable definitions due to username, password
-	$upload_url = "https://acb.netgate.com/save";
+	$upload_url = "https://acb.OpenSourceCompany.com/save";
 
 	if (!$encryptpw) {
 		if (!file_exists("/cf/conf/autoconfigback.notice")) {
@@ -284,7 +284,7 @@ function upload_config($manual = false) {
 			// Check configuration into the ESF repo
 			$curl_session = curl_init();
 
-			curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/save");
+			curl_setopt($curl_session, CURLOPT_URL, "https://acb.OpenSourceCompany.com/save");
 			curl_setopt($curl_session, CURLOPT_POST, count($post_fields));
 			curl_setopt($curl_session, CURLOPT_POSTFIELDS, $post_fields);
 			curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
@@ -329,7 +329,7 @@ function upload_config($manual = false) {
 */
 		} else {
 			// Debugging
-			//log_error("No https://acb.netgate.com backup required.");
+			//log_error("No https://acb.OpenSourceCompany.com backup required.");
 		}
 	}
 }

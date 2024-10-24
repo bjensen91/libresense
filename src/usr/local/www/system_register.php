@@ -2,9 +2,9 @@
 /*
  * system_register.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -43,31 +43,31 @@ $pgtitle = array(gettext("System"), gettext("Register"));
 $pghelp = sprintf(gettext('Thank you for choosing %1s%2s'), g_get('product_label_html'), '<br /><br />');
 
 $pghelp_notrequired = gettext("Your device does not require registration, we recognize it already." .
-   " You may have already registered, or it may be a pre-registered Netgate appliance.");
+   " You may have already registered, or it may be a pre-registered OpenSourceCompany appliance.");
 
 $pghelp_offline = gettext("The registration system is not currently available. Please check your network connection and try again.");
 
-$pghelp_ok = gettext('pfSense<sup>&reg;</sup> Community Edition software may be upgraded to pfSense<sup>&reg;</sup> Plus software by purchasing an upgrade from the Netgate store here: ' .
-'<a href="https://redirects.netgate.com/upgrade">Upgrade</a>' .
+$pghelp_ok = gettext('libresense<sup>&reg;</sup> Community Edition software may be upgraded to libresense<sup>&reg;</sup> Plus software by purchasing an upgrade from the OpenSourceCompany store here: ' .
+'<a href="https://redirects.OpenSourceCompany.com/upgrade">Upgrade</a>' .
 '<br />Once your upgrade purchase is complete, you will receive an activation token by email.' .
 'Please paste that token into the field below, then click “Register”.' .
-'<br /><br>Registration ensures you have access to the services included with pfSense<sup>&reg;</sup> Plus software.' .
-'<br />If you do not receive the activation token email within a few minutes of placing the order, please contact <a href="https://go.netgate.com">Netgate TAC</a>.');
+'<br /><br>Registration ensures you have access to the services included with libresense<sup>&reg;</sup> Plus software.' .
+'<br />If you do not receive the activation token email within a few minutes of placing the order, please contact <a href="https://go.OpenSourceCompany.com">OpenSourceCompany TAC</a>.');
 
 $pghelp_exists = sprintf(gettext("This device has already been registered. " .
-   "If you believe that to be incorrect, please contact Netgate TAC support for assistance by visiting %1s."),
-   '<a href="https://go.netgate.com", target="_blank">https://go.netgate.com</a>');
+   "If you believe that to be incorrect, please contact OpenSourceCompany TAC support for assistance by visiting %1s."),
+   '<a href="https://go.OpenSourceCompany.com", target="_blank">https://go.OpenSourceCompany.com</a>');
 
 $pghelp_notready = sprintf(gettext("The registration service is not available yet. Please watch %1s, %2s, %3s,  for updates."),
-   '<a href="https://www.netgate.com/blog/" target="_blank">our blog</a>',
-   '<a href="https://twitter.com/NetgateUSA" target="_blank">Twitter</a>',
-   '<a href="https://www.reddit.com/r/Netgate/" target="_blank">Reddit</a>'
+   '<a href="https://www.OpenSourceCompany.com/blog/" target="_blank">our blog</a>',
+   '<a href="https://twitter.com/OpenSourceCompanyUSA" target="_blank">Twitter</a>',
+   '<a href="https://www.reddit.com/r/OpenSourceCompany/" target="_blank">Reddit</a>'
 );
 
-$pghelp_success = gettext("Your firewall has been successfully registered. On your next visit to the System/Update page, select pfSense<sup>&reg;</sup> Plus software from the list of repositories.");
+$pghelp_success = gettext("Your firewall has been successfully registered. On your next visit to the System/Update page, select libresense<sup>&reg;</sup> Plus software from the list of repositories.");
 
 $pghelp_notfound = sprintf(gettext("This activation token is not valid. " .
-   "Please contact Netgate TAC support for assistance by visiting %1s"), '<a href="https://go.netgate.com" target="_blank">https://go.netgate.com</a>');
+   "Please contact OpenSourceCompany TAC support for assistance by visiting %1s"), '<a href="https://go.OpenSourceCompany.com" target="_blank">https://go.OpenSourceCompany.com</a>');
 
 $disabled = "disabled";
 $activation_token = "";

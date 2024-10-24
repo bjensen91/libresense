@@ -2,11 +2,11 @@
 /*
  * services_unbound_acls.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
- * Copyright (c) 2014 Warren Baker (warren@pfsense.org)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
+ * Copyright (c) 2014 Warren Baker (warren@libresense.org)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@
 ##|-PRIV
 
 require_once("guiconfig.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("unbound.inc");
 
 $id = $_REQUEST['id'];
@@ -40,7 +40,7 @@ if (isset($_POST['aclid'])) {
 }
 
 if (!empty($id) && !is_numeric($id)) {
-	pfSenseHeader("services_unbound_acls.php");
+	libresenseHeader("services_unbound_acls.php");
 	exit;
 }
 
@@ -48,7 +48,7 @@ $act = $_REQUEST['act'];
 
 if ($_POST['act'] == "del") {
 	if (!config_get_path('unbound/acls/' . $id)) {
-		pfSenseHeader("services_unbound_acls.php");
+		libresenseHeader("services_unbound_acls.php");
 		exit;
 	}
 
@@ -141,7 +141,7 @@ if ($_POST['save']) {
 			mark_subsystem_dirty("unbound");
 			write_config(gettext("Access list configured for DNS Resolver."));
 
-			pfSenseHeader("/services_unbound_acls.php");
+			libresenseHeader("/services_unbound_acls.php");
 			exit;
 		}
 	}

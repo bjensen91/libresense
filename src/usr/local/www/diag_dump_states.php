@@ -2,10 +2,10 @@
 /*
  * diag_dump_states.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2005 Colin Smith
  * All rights reserved.
  *
@@ -36,7 +36,7 @@ require_once("diag_dump_states.inc");
 /* handle AJAX operations */
 if (isset($_POST['action']) && $_POST['action'] == "remove") {
 	if (isset($_POST['srcip']) && isset($_POST['dstip']) && is_ipaddr($_POST['srcip']) && is_ipaddr($_POST['dstip'])) {
-		$retval = pfSense_kill_states($_POST['srcip'], $_POST['dstip']);
+		$retval = libresense_kill_states($_POST['srcip'], $_POST['dstip']);
 		echo htmlentities("|{$_POST['srcip']}|{$_POST['dstip']}|0|");
 	} else {
 		echo gettext("invalid input");
@@ -55,8 +55,8 @@ if (isset($_POST['filter']) && isset($_POST['killfilter'])) {
 		$tokill = "";
 	}
 	if (!empty($tokill)) {
-		$retval = pfSense_kill_states($tokill);
-		$retval = pfSense_kill_states("0.0.0.0/0", $tokill);
+		$retval = libresense_kill_states($tokill);
+		$retval = libresense_kill_states("0.0.0.0/0", $tokill);
 	}
 }
 

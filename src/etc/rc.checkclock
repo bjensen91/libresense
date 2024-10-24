@@ -2,8 +2,8 @@
 #
 # rc.checkclock
 #
-# part of pfSense (https://www.pfsense.org)
-# Copyright (c) 2022-2023 Rubicon Communications, LLC (Netgate)
+# part of libresense (https://www.libresense.org)
+# Copyright (c) 2022-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # originally based on m0n0wall (http://neon1.net/m0n0wall)

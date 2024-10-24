@@ -2,10 +2,10 @@
 /*
  * system_gateways.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2010 Seth Mos <seth.mos@dds.nl>
  * All rights reserved.
  *
@@ -122,7 +122,7 @@ function can_delete_disable_gateway_item($id, $disable = false) {
 	}
 
 	/* prevent removing a gateway if it's still in use by DNS servers
-	 * see https://redmine.pfsense.org/issues/8390 */
+	 * see https://redmine.libresense.org/issues/8390 */
 	$dnsgw_counter = 1;
 	init_config_arr(array('system', 'dnsserver'));
 	foreach ($config['system']['dnsserver'] as $dnsserver) {

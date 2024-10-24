@@ -1,8 +1,8 @@
 /*
  * upgradeconfig
  *
- * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2022-2023 Rubicon Communications, LLC (Netgate)
+ * part of libresense (https://www.libresense.org)
+ * Copyright (c) 2022-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,7 +95,7 @@ unset($config);
 global $config;
 
 /* Read in the desired config */
-$config = parse_xml_config($in_file, array($g['xml_rootobj'], 'pfsense'));
+$config = parse_xml_config($in_file, array($g['xml_rootobj'], 'libresense'));
 $prev_version = $config['version'];
 
 /* If it's already current, there is nothing to do. */

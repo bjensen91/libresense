@@ -5,10 +5,10 @@
  * Copyright (c) 2017-2019 Anders Lind (anders.lind@gmail.com)
  * All rights reserved.
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2011 Seth Mos
  * All rights reserved.
  *
@@ -111,7 +111,7 @@ function gui_parse_leases(&$pools, &$leases, &$prefixes, &$mappings, $raw_leases
 			gui_parse_single_lease(IA_PD, $val['NEXT_LEVEL'], $lang_pack, $ndpdata, $mappings, $entry);
 			$prefixes[] = $entry;
 		} elseif (preg_match('/^ia-ta$/i', $val['IA_ASSOC'])) {
-			// Not used in the pfSense UI at the moment.
+			// Not used in the libresense UI at the moment.
 			general_debug('Notice: ia-ta is unhandled for now.');
 		}
 
@@ -145,7 +145,7 @@ function gui_parse_single_lease($type, $content, $lang_pack, $ndpdata, &$mapping
 		case IA_PD:
 			preg_match_all('/'.pd_regex.'/i', $content, $matches, PREG_SET_ORDER);
 			break;
-		// case IA_TA: // Not implemented in pfSense.
+		// case IA_TA: // Not implemented in libresense.
 		default:
 			general_debug('Error: Unhandled lease type.');
 			return -1;

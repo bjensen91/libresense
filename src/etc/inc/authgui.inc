@@ -2,13 +2,13 @@
 /*
  * authgui.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2003-2006 Manuel Kasper <mk@neon1.net>
  * Copyright (c) 2005-2006 Bill Marquette <bill.marquette@gmail.com>
  * Copyright (c) 2006 Paul Taylor <paultaylor@winn-dixie.com>
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ include_once("priv.inc");
 if (!function_exists('platform_booting')) {
 	require_once('globals.inc');
 }
-require_once('pfsense-utils.inc');
+require_once('libresense-utils.inc');
 
 /* Authenticate user - exit if failed */
 if (!session_auth()) {
@@ -67,7 +67,7 @@ if (!isAllowedPage($_SERVER['REQUEST_URI'])) {
 		$page = str_replace('*', '', $allowedpages[0]);
 		$_SESSION['Post_Login'] = true;
 		require_once("functions.inc");
-		pfSenseHeader("/{$page}");
+		libresenseHeader("/{$page}");
 
 		$username = get_config_user();
 		log_error("{$username} attempted to access {$_SERVER['SCRIPT_NAME']} but does not have access to that page. Redirecting to {$page}.");
@@ -91,7 +91,7 @@ if (!isAllowedPage($_SERVER['REQUEST_URI'])) {
 if (!$_SESSION['Post_Login']) {
 	$_SESSION['Post_Login'] = true;
 	require_once("functions.inc");
-	pfSenseHeader($_SERVER['REQUEST_URI']);
+	libresenseHeader($_SERVER['REQUEST_URI']);
 	exit;
 }
 
@@ -381,7 +381,7 @@ function display_login_form() {
 
 	    <script src="/vendor/jquery/jquery-3.5.1.min.js?v=<?=filemtime('/usr/local/www/vendor/jquery/jquery-3.5.1.min.js')?>"></script>
 		<script src="/vendor/bootstrap/js/bootstrap.min.js?v=<?=filemtime('/usr/local/www/vendor/bootstrap/js/bootstrap.min.js')?>"></script>
-		<script src="/js/pfSense.js?v=<?=filemtime('/usr/local/www/js/pfSense.js')?>"></script>
+		<script src="/js/libresense.js?v=<?=filemtime('/usr/local/www/js/libresense.js')?>"></script>
 
 		<script type="text/javascript">
 		//!<[CDATA[

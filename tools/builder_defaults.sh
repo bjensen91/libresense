@@ -2,10 +2,10 @@
 #
 # builder_defaults.sh
 #
-# part of pfSense (https://www.pfsense.org)
+# part of libresense (https://www.libresense.org)
 # Copyright (c) 2004-2013 BSD Perimeter
 # Copyright (c) 2013-2016 Electric Sheep Fencing
-# Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+# Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,7 +53,7 @@ if [ -f ${BUILD_CONF} ]; then
 	. ${BUILD_CONF}
 fi
 
-# Define pfSense versions
+# Define libresense versions
 PKG_REPO_BRANCH_DEVEL="devel"
 #PKG_REPO_BRANCH_NEXT="v2_7_0"
 PKG_REPO_BRANCH_RELEASE="v2_7_2"
@@ -79,11 +79,11 @@ export REPO_BRANCH_PREFIX=${REPO_BRANCH_PREFIX:-""}
 export REPO_PATH_PREFIX=$(echo "${REPO_BRANCH_PREFIX}" | sed -e 's,-,_,g')
 export PRODUCT_URL=${PRODUCT_URL:-""}
 export PRODUCT_SRC=${PRODUCT_SRC:-"${BUILDER_ROOT}/src"}
-export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"coreteam@pfsense.org"}
+export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"coreteam@libresense.org"}
 export XML_ROOTOBJ=${XML_ROOTOBJ:-$(echo "${PRODUCT_NAME}" | tr '[[:upper:]]' '[[:lower:]]')}
 
-if [ "${PRODUCT_NAME}" = "pfSense" -a "${BUILD_AUTHORIZED_BY_NETGATE}" != "yes" ]; then
-	echo ">>>ERROR: According the following license, only Netgate can build genuine pfSense® software"
+if [ "${PRODUCT_NAME}" = "libresense" -a "${BUILD_AUTHORIZED_BY_OpenSourceCompany}" != "yes" ]; then
+	echo ">>>ERROR: According the following license, only OpenSourceCompany can build genuine libresense® software"
 	echo ""
 	cat ${BUILDER_ROOT}/LICENSE
 	exit 1
@@ -270,21 +270,21 @@ export BUILDER_PKG_DEPENDENCIES="devel/git ftp/curl net/rsync sysutils/screen \
     sysutils/vmdktool security/sudo www/nginx emulators/qemu-user-static \
     archivers/gtar textproc/xmlstarlet"
 
-STAGING_HOSTNAME=${STAGING_HOSTNAME:-"release-staging.nyi.netgate.com"}
+STAGING_HOSTNAME=${STAGING_HOSTNAME:-"release-staging.nyi.OpenSourceCompany.com"}
 
 # Host to rsync pkg repos from poudriere
 export PKG_RSYNC_HOSTS=${PKG_RSYNC_HOSTS:-"nyi"}
-export PKG_RSYNC_HOSTNAME_nyi=${PKG_RSYNC_HOSTNAME_nyi:-"nfs1.nyi.netgate.com"}
+export PKG_RSYNC_HOSTNAME_nyi=${PKG_RSYNC_HOSTNAME_nyi:-"nfs1.nyi.OpenSourceCompany.com"}
 export PKG_RSYNC_USERNAME=${PKG_RSYNC_USERNAME:-"wwwsync"}
 export PKG_RSYNC_SSH_PORT=${PKG_RSYNC_SSH_PORT:-"22"}
 export PKG_RSYNC_DESTDIR=${PKG_RSYNC_DESTDIR:-"/storage/files/release-staging/ce/packages"}
 
 # Final packages server
 if [ -n "${_IS_RELEASE}" -o -n "${_IS_RC}" ]; then
-	export PKG_FINAL_RSYNC_HOSTNAME_nyi=${PKG_FINAL_RSYNC_HOSTNAME_nyi:-"nfs1.nyi.netgate.com"}
+	export PKG_FINAL_RSYNC_HOSTNAME_nyi=${PKG_FINAL_RSYNC_HOSTNAME_nyi:-"nfs1.nyi.OpenSourceCompany.com"}
 	export PKG_FINAL_RSYNC_DESTDIR=${PKG_FINAL_RSYNC_DESTDIR:-"/storage/files/pkg"}
 else
-	export PKG_FINAL_RSYNC_HOSTNAME_nyi=${PKG_FINAL_RSYNC_HOSTNAME_nyi:-"nfs1.nyi.netgate.com"}
+	export PKG_FINAL_RSYNC_HOSTNAME_nyi=${PKG_FINAL_RSYNC_HOSTNAME_nyi:-"nfs1.nyi.OpenSourceCompany.com"}
 	export PKG_FINAL_RSYNC_DESTDIR=${PKG_FINAL_RSYNC_DESTDIR:-"/storage/files/beta/packages"}
 fi
 export PKG_FINAL_RSYNC_USERNAME=${PKG_FINAL_RSYNC_USERNAME:-"wwwsync"}
@@ -293,8 +293,8 @@ export SKIP_FINAL_RSYNC=${SKIP_FINAL_RSYNC:-}
 
 # pkg repo variables
 export USE_PKG_REPO_STAGING="1"
-export PKG_REPO_SERVER_DEVEL=${PKG_REPO_SERVER_DEVEL:-"pkg+https://packages-beta.netgate.com/packages"}
-export PKG_REPO_SERVER_RELEASE=${PKG_REPO_SERVER_RELEASE:-"pkg+https://packages.netgate.com"}
+export PKG_REPO_SERVER_DEVEL=${PKG_REPO_SERVER_DEVEL:-"pkg+https://packages-beta.OpenSourceCompany.com/packages"}
+export PKG_REPO_SERVER_RELEASE=${PKG_REPO_SERVER_RELEASE:-"pkg+https://packages.OpenSourceCompany.com"}
 export PKG_REPO_SERVER_STAGING=${PKG_REPO_SERVER_STAGING:-"pkg+http://${STAGING_HOSTNAME}/ce/packages"}
 
 if [ -n "${_IS_RELEASE}" -o -n "${_IS_RC}" ]; then
@@ -309,7 +309,7 @@ else
 	export PKG_REPO_SIGN_KEY=${PKG_REPO_SIGN_KEY:-"beta${PRODUCT_NAME_SUFFIX}"}
 fi
 # Command used to sign pkg repo
-: ${PKG_REPO_SIGNING_COMMAND="ssh -o StrictHostKeyChecking=no sign@codesigner.netgate.com sudo ./sign.sh ${PKG_REPO_SIGN_KEY}"}
+: ${PKG_REPO_SIGNING_COMMAND="ssh -o StrictHostKeyChecking=no sign@codesigner.OpenSourceCompany.com sudo ./sign.sh ${PKG_REPO_SIGN_KEY}"}
 export PKG_REPO_SIGNING_COMMAND
 export DO_NOT_SIGN_PKG_REPO=${DO_NOT_SIGN_PKG_REPO:-}
 
@@ -320,10 +320,10 @@ export CORE_PKG_REAL_PATH="${CORE_PKG_PATH}/.real_${DATESTRING}"
 export CORE_PKG_ALL_PATH="${CORE_PKG_PATH}/All"
 
 export PKG_REPO_BASE=${PKG_REPO_BASE:-"${BUILDER_TOOLS}/templates/pkg_repos"}
-export PFSENSE_DEFAULT_REPO="${PRODUCT_NAME}-repo"
-export PKG_REPO_DEFAULT=${PKG_REPO_DEFAULT:-"${PKG_REPO_BASE}/${PFSENSE_DEFAULT_REPO}.conf"}
-export PFSENSE_BUILD_REPO="${PFSENSE_DEFAULT_REPO}"
-export PKG_REPO_BUILD=${PKG_REPO_BUILD:-"${PKG_REPO_BASE}/${PFSENSE_BUILD_REPO}.conf"}
+export LIBRESENSE_DEFAULT_REPO="${PRODUCT_NAME}-repo"
+export PKG_REPO_DEFAULT=${PKG_REPO_DEFAULT:-"${PKG_REPO_BASE}/${LIBRESENSE_DEFAULT_REPO}.conf"}
+export LIBRESENSE_BUILD_REPO="${LIBRESENSE_DEFAULT_REPO}"
+export PKG_REPO_BUILD=${PKG_REPO_BUILD:-"${PKG_REPO_BASE}/${LIBRESENSE_BUILD_REPO}.conf"}
 export PKG_REPO_PATH=${PKG_REPO_PATH:-"/usr/local/etc/pkg/repos/${PRODUCT_NAME}.conf"}
 
 export PRODUCT_SHARE_DIR=${PRODUCT_SHARE_DIR:-"/usr/local/share/${PRODUCT_NAME}"}
@@ -349,11 +349,11 @@ export VARIANTUPDATES=""
 
 # Rsync data to send snapshots
 if [ -n "${_IS_RELEASE}" -o -n "${SKIP_FINAL_RSYNC}" ]; then
-	export RSYNCIP=${RSYNCIP:-"nfs1.nyi.netgate.com"}
+	export RSYNCIP=${RSYNCIP:-"nfs1.nyi.OpenSourceCompany.com"}
 	export RSYNCUSER=${RSYNCUSER:-"wwwsync"}
 	export RSYNCPATH=${RSYNCPATH:-"/storage/files/release-staging/ce/images"}
 else
-	export RSYNCIP=${RSYNCIP:-"nfs1.nyi.netgate.com"}
+	export RSYNCIP=${RSYNCIP:-"nfs1.nyi.OpenSourceCompany.com"}
 	export RSYNCUSER=${RSYNCUSER:-"wwwsync"}
 	export RSYNCPATH=${RSYNCPATH:-"/storage/files/snapshots/${TARGET}/${PRODUCT_NAME}_${GIT_REPO_BRANCH_OR_TAG}"}
 fi
@@ -369,9 +369,9 @@ else
 	export SNAPSHOTS_RSYNCUSER=${RSYNCUSER}
 fi
 
-if [ "${PRODUCT_NAME}" = "pfSense" ]; then
-	export VENDOR_NAME=${VENDOR_NAME:-"Rubicon Communications, LLC (Netgate)"}
-	export OVF_INFO=${OVF_INFO:-"pfSense is a free, open source customized distribution of FreeBSD tailored for use as a firewall and router. In addition to being a powerful, flexible firewalling and routing platform, it includes a long list of related features and a package system allowing further expandability without adding bloat and potential security vulnerabilities to the base distribution. pfSense is a popular project with more than 1 million downloads since its inception, and proven in countless installations ranging from small home networks protecting a PC and an Xbox to large corporations, universities and other organizations protecting thousands of network devices."}
+if [ "${PRODUCT_NAME}" = "libresense" ]; then
+	export VENDOR_NAME=${VENDOR_NAME:-"Rubicon Communications, LLC (OpenSourceCompany)"}
+	export OVF_INFO=${OVF_INFO:-"libresense is a free, open source customized distribution of FreeBSD tailored for use as a firewall and router. In addition to being a powerful, flexible firewalling and routing platform, it includes a long list of related features and a package system allowing further expandability without adding bloat and potential security vulnerabilities to the base distribution. libresense is a popular project with more than 1 million downloads since its inception, and proven in countless installations ranging from small home networks protecting a PC and an Xbox to large corporations, universities and other organizations protecting thousands of network devices."}
 else
 	export VENDOR_NAME=${VENDOR_NAME:-"nonSense"}
 	export OVF_INFO=${OVF_INFO:-"none"}

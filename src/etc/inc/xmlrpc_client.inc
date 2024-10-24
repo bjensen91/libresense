@@ -2,9 +2,9 @@
 /*
  * xmlrpc_client.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2016 Electric Sheep Fencing
- * Copyright (c) 2016-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2016-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
 
 require_once("XML/RPC2/Client.php");
 
-class pfsense_xmlrpc_client {
+class libresense_xmlrpc_client {
 
 	private $username, $password, $url, $logurl, $filenotice, $error;
 
@@ -30,7 +30,7 @@ class pfsense_xmlrpc_client {
 		global $config;
 		$hasync = config_get_path('hasync', []);
 		/* XMLRPC sync is not configured, nothing to do.
-		 * https://redmine.pfsense.org/issues/14182 */
+		 * https://redmine.libresense.org/issues/14182 */
 		if (empty($hasync)) {
 			$this->error = "XMLRPC Synchronization is not configured.";
 			return;
@@ -85,14 +85,14 @@ class pfsense_xmlrpc_client {
 
 	private function xmlrpc_internal($method, $parameter, $timeout = 240) {
 		/* XMLRPC sync is not configured, nothing to do.
-		 * https://redmine.pfsense.org/issues/14182 */
+		 * https://redmine.libresense.org/issues/14182 */
 		if (empty($this->url) ||
 		    empty($this->logurl)) {
 			$this->error = "XMLRPC Synchronization is not configured.";
 			return;
 		}
 		$options = array(
-			'prefix' => 'pfsense.',
+			'prefix' => 'libresense.',
 			'sslverify' => false,
 			'connectionTimeout' => $timeout
 		);
@@ -106,7 +106,7 @@ class pfsense_xmlrpc_client {
 			log_error(sprintf(gettext("Beginning XMLRPC sync data to %s."), $this->logurl));
 			$cli = XML_RPC2_Client::create($this->url, $options);
 			if (!is_object($cli)) {
-				$this->error = sprintf(gettext("A communications error occurred while attempting XMLRPC sync with %s (pfsense.%s)."), $this->log, $method);
+				$this->error = sprintf(gettext("A communications error occurred while attempting XMLRPC sync with %s (libresense.%s)."), $this->log, $method);
 			}
 			try {//restore_config_section
 				$REQUEST_URI = $_SERVER['REQUEST_URI'];
@@ -144,7 +144,7 @@ class pfsense_xmlrpc_client {
 				$this->error = "An authentication failure occurred while trying to access {$this->logurl} ({$method}).";
 			}
 			if (empty($this->error)) {
-				log_error(sprintf(gettext("XMLRPC reload data success with %s (pfsense.{$method})."), $this->logurl));
+				log_error(sprintf(gettext("XMLRPC reload data success with %s (libresense.{$method})."), $this->logurl));
 				return $resp;
 			} elseif ($numberofruns < $max_attempts) {
 				log_error(sprintf(gettext("Retrying XMLRPC Request due to error: %s"), $this->error));

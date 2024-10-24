@@ -1,6 +1,6 @@
 #!/bin/sh
-# part of pfSense (https://www.pfsense.org)
-# Copyright (c) 2017-2023 Rubicon Communications, LLC (Netgate)
+# part of libresense (https://www.libresense.org)
+# Copyright (c) 2017-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,7 @@ done
 # Display a menu with all of the disk choices located above
 if [ -n "${target_list}" ]; then
 	exec 3>&1
-	recover_disk_choice=`echo ${target_list} | xargs dialog --backtitle "pfSense Installer" \
+	recover_disk_choice=`echo ${target_list} | xargs dialog --backtitle "libresense Installer" \
 		--title "Recover config.xml and SSH keys" \
 		--menu "Select the partition containing config.xml" \
 		0 0 0 2>&1 1>&3` || exit 1
@@ -86,9 +86,9 @@ if [ -n "${recover_disk}" ] ; then
 			/sbin/kldload zfs
 
 			# Import pool with alternate mount.
-			if /sbin/zpool import | /usr/bin/awk '/pool:/ {print $2}' | /usr/bin/grep -q pfSense; then
-				# If the pool name is pfSense, it's the new style layout
-				pool_name="pfSense"
+			if /sbin/zpool import | /usr/bin/awk '/pool:/ {print $2}' | /usr/bin/grep -q libresense; then
+				# If the pool name is libresense, it's the new style layout
+				pool_name="libresense"
 			else
 				# Old pool name
 				pool_name="zroot"

@@ -2,10 +2,10 @@
 /*
  * system_usermanager_settings.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2007 Bill Marquette <bill.marquette@gmail.com>
  * All rights reserved.
  *
@@ -107,7 +107,7 @@ if (isset($config['system']['webgui']['authmode'])) {
 }
 
 /* Default to bcrypt hashing if unset.
- * See https://redmine.pfsense.org/issues/12855
+ * See https://redmine.libresense.org/issues/12855
  */
 $pconfig['pwhash'] = isset($config['system']['webgui']['pwhash']) ? $config['system']['webgui']['pwhash'] : 'bcrypt';
 
@@ -224,9 +224,9 @@ $tab_array[] = array(gettext("Settings"), true, "system_usermanager_settings.php
 $tab_array[] = array(gettext("Authentication Servers"), false, "system_authservers.php");
 display_top_tabs($tab_array);
 
-/* Default to pfsense backend type if none is defined */
+/* Default to libresense backend type if none is defined */
 if (!$pconfig['backend']) {
-	$pconfig['backend'] = "pfsense";
+	$pconfig['backend'] = "libresense";
 }
 
 $form = new Form;

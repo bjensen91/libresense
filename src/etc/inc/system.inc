@@ -2,10 +2,10 @@
 /*
  * system.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -164,7 +164,7 @@ function activate_sysctls() {
 	$sysctls = array_merge($sysctls, $ipsec_filter_sysctl[$ipsec_filtermode]);
 
 	/*
-	 * See https://redmine.pfsense.org/issues/13938
+	 * See https://redmine.libresense.org/issues/13938
 	 *
 	 * We need to disable unmapped mbufs to work around a bug
 	 * that can cause sendfile to crash.
@@ -188,11 +188,11 @@ function activate_sysctls() {
 	}
 
 	/* Set net.pf.request_maxcount via sysctl since it is no longer a loader
-	 *   tunable. See https://redmine.pfsense.org/issues/10861
+	 *   tunable. See https://redmine.libresense.org/issues/10861
 	 *   Set the value dynamically since its default is not static, yet this
 	 *   still could be overridden by a user tunable. */
 	$maximumtableentries = config_get_path('system/maximumtableentries',
-										   pfsense_current_table_entries_size());
+										   libresense_current_table_entries_size());
 
 	/* Set the default when there is no tunable or when the tunable is set
 	 * too low. */
@@ -285,7 +285,7 @@ function system_resolvconf_generate($dynupdate = false) {
 		$dnsserver = $syscfg['dnsserver'][$dnscounter - 1];
 
 		/* Only modify routes for non-interface addresses;
-		 * see https://redmine.pfsense.org/issues/14288 */
+		 * see https://redmine.libresense.org/issues/14288 */
 		if (!empty($dnsserver) && !in_array($dnsserver, $exempt_addresses)) {
 			// specify IP protocol version for correct add/del
 			if (is_ipaddrv4($dnsserver)) {
@@ -333,7 +333,7 @@ function get_searchdomains() {
 }
 
 /* Stub for deprecated function name
- * See https://redmine.pfsense.org/issues/10931 */
+ * See https://redmine.libresense.org/issues/10931 */
 function get_nameservers() {
 	return get_dynamic_nameservers();
 }
@@ -675,7 +675,7 @@ function system_hosts_generate() {
 function system_dhcpleases_configure() {
 	global $g;
 	if (!function_exists('is_dhcp_server_enabled')) {
-		require_once('pfsense-utils.inc');
+		require_once('libresense-utils.inc');
 	}
 	$pidfile = "{$g['varrun_path']}/dhcpleases.pid";
 
@@ -1418,8 +1418,8 @@ function system_staticroutes_configure($interface = "", $update_dns = false) {
 
 		foreach ($static_routes as $rtent) {
 			/* Do not delete disabled routes,
-			 * see https://redmine.pfsense.org/issues/3709
-			 * and https://redmine.pfsense.org/issues/10706 */
+			 * see https://redmine.libresense.org/issues/3709
+			 * and https://redmine.libresense.org/issues/10706 */
 			if (isset($rtent['disabled'])) {
 				continue;
 			}
@@ -1517,7 +1517,7 @@ function system_staticroutes_configure($interface = "", $update_dns = false) {
 		unset($gateways_arr);
 
 		/* keep static routes cache,
-		 * see https://redmine.pfsense.org/issues/11599 */
+		 * see https://redmine.libresense.org/issues/11599 */
 		$id = 0;
 		foreach (config_get_path('staticroutes/route', []) as $sroute) {
 			$targets = array();
@@ -2145,7 +2145,7 @@ function check_gps_speed($device) {
 }
 
 /* Generate list of possible NTP poll values
- * https://redmine.pfsense.org/issues/9439 */
+ * https://redmine.libresense.org/issues/9439 */
 global $ntp_poll_min_value, $ntp_poll_max_value;
 global $ntp_poll_min_default_gps, $ntp_poll_max_default_gps;
 global $ntp_poll_min_default_pps, $ntp_poll_max_default_pps;
@@ -2366,7 +2366,7 @@ function system_ntp_configure() {
 	}
 
 	$ntpcfg = "# \n";
-	$ntpcfg .= "# pfSense ntp configuration file \n";
+	$ntpcfg .= "# libresense ntp configuration file \n";
 	$ntpcfg .= "# \n\n";
 	$ntpcfg .= "tinker panic 0 \n\n";
 
@@ -2786,7 +2786,7 @@ function system_reboot_cleanup() {
 
 	require_once("voucher.inc");
 	voucher_save_db_to_config();
-	require_once("pfsense-utils.inc");
+	require_once("libresense-utils.inc");
 	enable_carp(false);
 	require_once("pkg-utils.inc");
 	stop_packages();
@@ -2875,7 +2875,7 @@ function system_set_harddisk_standby() {
 			$harddisks = get_smart_drive_list();
 
 			// Since get_smart_drive_list() only matches ad|da|ada; lets put the check below
-			// just in case of some weird pfSense platform installs.
+			// just in case of some weird libresense platform installs.
 			if (count($harddisks) > 0) {
 				// Iterate disks and run the camcontrol command for each
 				foreach ($harddisks as $harddisk) {
@@ -3091,11 +3091,11 @@ function system_identify_specific_platform() {
 
 	switch ($product[0]) {
 		case 'FW7541':
-			return (array('name' => 'FW7541', 'descr' => 'Netgate FW7541'));
+			return (array('name' => 'FW7541', 'descr' => 'OpenSourceCompany FW7541'));
 			break;
 		case 'apu1':
 		case 'APU':
-			return (array('name' => 'APU', 'descr' => 'Netgate APU'));
+			return (array('name' => 'APU', 'descr' => 'OpenSourceCompany APU'));
 			break;
 		case 'RCC-VE':
 			$result = array();
@@ -3114,17 +3114,17 @@ function system_identify_specific_platform() {
 			} else {
 				$result['model'] = 'RCC-VE';
 			}
-			$result['descr'] = 'Netgate ' . $result['model'];
+			$result['descr'] = 'OpenSourceCompany ' . $result['model'];
 			return $result;
 			break;
 		case 'DFFv2':
-			return (array('name' => 'SG-2220', 'descr' => 'Netgate SG-2220'));
+			return (array('name' => 'SG-2220', 'descr' => 'OpenSourceCompany SG-2220'));
 			break;
 		case 'RCC':
-			return (array('name' => 'RCC', 'descr' => 'Netgate XG-2758'));
+			return (array('name' => 'RCC', 'descr' => 'OpenSourceCompany XG-2758'));
 			break;
 		case 'SG-5100':
-			return (array('name' => '5100', 'descr' => 'Netgate 5100'));
+			return (array('name' => '5100', 'descr' => 'OpenSourceCompany 5100'));
 			break;
 		case 'Minnowboard Turbot D0 PLATFORM':
 		case 'Minnowboard Turbot D0/D1 PLATFORM':
@@ -3144,7 +3144,7 @@ function system_identify_specific_platform() {
 				$result['model'] = $result['name'];
 				break;
 			}
-			$result['descr'] = 'Netgate ' . $result['model'];
+			$result['descr'] = 'OpenSourceCompany ' . $result['model'];
 			return $result;
 			break;
 		case 'SYS-5018A-FTN4':

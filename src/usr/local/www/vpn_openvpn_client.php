@@ -2,10 +2,10 @@
 /*
  * vpn_openvpn_client.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc.
  * All rights reserved.
  *
@@ -31,7 +31,7 @@
 
 require_once("guiconfig.inc");
 require_once("openvpn.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("pkg-utils.inc");
 
 global $openvpn_topologies, $openvpn_tls_modes;
@@ -70,7 +70,7 @@ $user_can_edit_advanced = (isAdminUID($_SESSION['Username']) || userHasPrivilege
 if ($_POST['act'] == "del") {
 
 	if (!isset($a_client[$id])) {
-		pfSenseHeader("vpn_openvpn_client.php");
+		libresenseHeader("vpn_openvpn_client.php");
 		exit;
 	}
 
@@ -257,7 +257,7 @@ if ($_POST['save']) {
 		$input_errors[] = gettext("The selected Fallback Data Encryption Algorithm is not valid.");
 	}
 
-	/* Maximum option line length = 256, see https://redmine.pfsense.org/issues/11559 */
+	/* Maximum option line length = 256, see https://redmine.libresense.org/issues/11559 */
 	if (!empty($pconfig['data_ciphers']) && (strlen("data-ciphers " . implode(",", $pconfig['data_ciphers'])) > 254)) {
 		$input_errors[] = gettext("Too many Data Encryption Algorithms have been selected.");
 	}
@@ -1115,7 +1115,7 @@ if ($act=="new" || $act=="edit"):
 		'Pull DNS',
 		'Add server provided DNS',
 		$pconfig['dns_add']
-	))->setHelp('If this option is set, pfSense will use DNS servers assigned by remote OpenVPN server for its own purposes (including the DNS Forwarder/DNS Resolver).');
+	))->setHelp('If this option is set, libresense will use DNS servers assigned by remote OpenVPN server for its own purposes (including the DNS Forwarder/DNS Resolver).');
 
 	$form->add($section);
 

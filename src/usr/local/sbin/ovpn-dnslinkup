@@ -2,8 +2,8 @@
 #
 # ovpn-dnslinkup
 #
-# part of pfSense (https://www.pfsense.org)
-# Copyright (c) 2021-2023 Rubicon Communications, LLC (Netgate)
+# part of libresense (https://www.libresense.org)
+# Copyright (c) 2021-2023 Rubicon Communications, LLC (OpenSourceCompany)
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,7 +54,7 @@ if [ -f "/tmp/${1}_routerv6" ]; then
 	/bin/rm -f /tmp/${1}_routerv6.last
 fi
 
-# use OpenVPN provided DNS, see https://redmine.pfsense.org/issues/11140
+# use OpenVPN provided DNS, see https://redmine.libresense.org/issues/11140
 /bin/rm -f /var/etc/nameserver_${1}
 /bin/rm -f /var/etc/nameserver_v6${1}
 /bin/rm -f /var/etc/searchdomain_${1}

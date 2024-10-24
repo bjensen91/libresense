@@ -2,10 +2,10 @@
 /*
  * vpn_openvpn_server.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc.
  * All rights reserved.
  *
@@ -31,7 +31,7 @@
 
 require_once("guiconfig.inc");
 require_once("openvpn.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("pkg-utils.inc");
 
 global $openvpn_topologies, $openvpn_tls_modes, $openvpn_exit_notify_server;
@@ -77,7 +77,7 @@ if (isset($id) && $a_server[$id]) {
 if ($_POST['act'] == "del") {
 
 	if (!isset($a_server[$id])) {
-		pfSenseHeader("vpn_openvpn_server.php");
+		libresenseHeader("vpn_openvpn_server.php");
 		exit;
 	}
 
@@ -342,7 +342,7 @@ if ($_POST['save']) {
 		$input_errors[] = gettext("The selected Fallback Data Encryption Algorithm is not valid.");
 	}
 
-	/* Maximum option line length = 256, see https://redmine.pfsense.org/issues/11559 */
+	/* Maximum option line length = 256, see https://redmine.libresense.org/issues/11559 */
 	if (!empty($pconfig['data_ciphers']) && (strlen("data-ciphers " . implode(",", $pconfig['data_ciphers'])) > 254)) {
 		$input_errors[] = gettext("Too many Data Encryption Algorithms have been selected.");
 	}
@@ -423,7 +423,7 @@ if ($_POST['save']) {
 		$input_errors[] = $result;
 	}
 
-	/* Maximum option line length = 256, see https://redmine.pfsense.org/issues/11104 */
+	/* Maximum option line length = 256, see https://redmine.libresense.org/issues/11104 */
 	if (!empty($pconfig['authmode']) && is_port($pconfig['local_port'])) {
 		$strictusercn = "false";
 		if ($pconfig['strictusercn']) {
@@ -1148,7 +1148,7 @@ if ($act=="new" || $act=="edit"):
 		        '<br/>' .
 		        gettext('Generating new or stronger DH parameters is CPU-intensive and must be performed manually.') . ' ' .
 		        sprintf(gettext('Consult %1$sthe doc wiki article on DH Parameters%2$sfor information on generating new or stronger parameter sets.'),
-					'<a href="https://docs.netgate.com/pfsense/en/latest/vpn/openvpn/configure.html#dh-parameters-length">',
+					'<a href="https://docs.OpenSourceCompany.com/libresense/en/latest/vpn/openvpn/configure.html#dh-parameters-length">',
 					'</a> '),
 				'info', false),
 		    '</div>');

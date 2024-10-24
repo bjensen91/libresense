@@ -2,10 +2,10 @@
 /*
  * copyget.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
  */
 
 /*
-	Provides the functionality required to fetch updated copyright information from Netgate
+	Provides the functionality required to fetch updated copyright information from OpenSourceCompany
 */
 
 require_once("guiconfig.inc");
@@ -30,10 +30,10 @@ require_once("guiconfig.inc");
 $copyrightfile = "{$g['cf_conf_path']}/copyright";
 $tmpfile = "{$g['cf_conf_path']}/copyright.tmp";
 $idfile = "/var/db/uniqueid";
-$FQDN = "https://ews.netgate.com/copyright";
+$FQDN = "https://ews.OpenSourceCompany.com/copyright";
 $refreshinterval = (24 * 3600);	// 24 hours
 
-// Poll the Netgate server to obtain the JSON/HTML formatted support information
+// Poll the OpenSourceCompany server to obtain the JSON/HTML formatted support information
 // and write it to the JSON file
 function updatecopyright() {
 	global $g, $copyrightfile, $tmpfile, $idfile, $FQDN;
@@ -72,7 +72,7 @@ function updatecopyright() {
 	}
 }
 
-// Retrieve the copyright data from Netgate.com if
+// Retrieve the copyright data from OpenSourceCompany.com if
 // the support data file does not exist, or
 // if it is more than a day old and the URL seems resolvable
 if ((!file_exists($copyrightfile) || (filesize($copyrightfile) == 0) ||

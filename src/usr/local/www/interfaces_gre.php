@@ -2,10 +2,10 @@
 /*
  * interfaces_gre.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,7 +56,7 @@ if ($_POST['act'] == "del") {
 	} else if (gre_inuse($_POST['id'])) {
 		$input_errors[] = gettext("This GRE tunnel cannot be deleted because it is still being used as an interface.");
 	} else {
-		pfSense_interface_destroy($a_gres[$_POST['id']]['greif']);
+		libresense_interface_destroy($a_gres[$_POST['id']]['greif']);
 		unset($a_gres[$_POST['id']]);
 
 		write_config("GRE interface deleted");

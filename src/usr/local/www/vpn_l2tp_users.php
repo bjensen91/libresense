@@ -2,10 +2,10 @@
 /*
  * vpn_l2tp_users.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,7 @@ $pglinks = array("", "vpn_l2tp.php", "@self");
 $shortcut_section = "l2tps";
 
 require_once("guiconfig.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 require_once("vpn.inc");
 
 init_config_arr(array('l2tp', 'user'));
@@ -48,7 +48,7 @@ if ($_POST['act'] == "del") {
 		l2tp_users_sort();
 		write_config(gettext("Deleted a L2TP VPN user."));
 		vpn_l2tp_updatesecret();
-		pfSenseHeader("vpn_l2tp_users.php");
+		libresenseHeader("vpn_l2tp_users.php");
 		exit;
 	}
 }

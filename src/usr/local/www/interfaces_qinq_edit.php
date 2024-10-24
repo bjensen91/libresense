@@ -2,10 +2,10 @@
 /*
  * interfaces_qinq_edit.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ foreach ($lagglist as $lagg) {
 }
 
 /* Do not allow OpenVPN TUN interfaces to be used for QinQ
- * https://redmine.pfsense.org/issues/11675 */
+ * https://redmine.libresense.org/issues/11675 */
 init_config_arr(array('openvpn', 'openvpn-server'));
 init_config_arr(array('openvpn', 'openvpn-client'));
 foreach ($portlist as $portname => $port) {

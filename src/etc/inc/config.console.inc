@@ -2,10 +2,10 @@
 /*
  * config.console.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -240,7 +240,7 @@ EOD;
 	if (in_array($key, array('y', 'Y'))) {
 		if ($lanif) {
 			if (is_array($config['interfaces']['lan'])) {
-				$upints = pfSense_interface_listget(IFF_UP);
+				$upints = libresense_interface_listget(IFF_UP);
 				if (in_array($config['interfaces']['lan']['if'], $upints))
 					interface_bring_down('lan', true);
 			}
@@ -324,7 +324,7 @@ EOD;
 		}
 
 		if (is_array($config['interfaces']['wan'])) {
-			$upints = pfSense_interface_listget(IFF_UP);
+			$upints = libresense_interface_listget(IFF_UP);
 			if (in_array($config['interfaces']['wan']['if'], $upints))
 				interface_bring_down('wan', true);
 		}
@@ -346,7 +346,7 @@ EOD;
 
 		for ($i = 0; $i < count($optif); $i++) {
 			if (is_array($config['interfaces']['opt' . ($i+1)])) {
-				$upints = pfSense_interface_listget(IFF_UP);
+				$upints = libresense_interface_listget(IFF_UP);
 				if (in_array($config['interfaces']['opt' . ($i+1)]['if'], $upints))
 					interface_bring_down('opt' . ($i+1), true);
 			}

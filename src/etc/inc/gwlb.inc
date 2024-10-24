@@ -2,11 +2,11 @@
 /*
  * gwlb.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2008 Bill Marquette, Seth Mos
  * Copyright (c) 2008-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -260,7 +260,7 @@ function setup_gateways_monitor() {
 						    $gateway['gateway']);
 					}
 
-					pfSense_kill_states("0.0.0.0/0", $gateway['monitor'], $gateway['interface'], "icmp");
+					libresense_kill_states("0.0.0.0/0", $gateway['monitor'], $gateway['interface'], "icmp");
 				}
 			}
 		} else if ($gateway['ipprotocol'] == "inet6") { // This is an IPv6 gateway...
@@ -307,7 +307,7 @@ function setup_gateways_monitor() {
 						    $gateway['gateway']);
 					}
 
-					pfSense_kill_states("::0.0.0.0/0", $gateway['monitor'], $gateway['interface'], "icmpv6");
+					libresense_kill_states("::0.0.0.0/0", $gateway['monitor'], $gateway['interface'], "icmpv6");
 				}
 			}
 		} else {
@@ -1122,7 +1122,7 @@ function fixup_default_gateway($ipprotocol, $gateways_status, $gateways_arr) {
 	global $config, $g;
 	/*
 	 * NOTE: The code below is meant to replace the default gateway when it goes down.
-	 *	This facilitates services running on pfSense itself and are not handled by a PBR to continue working.
+	 *	This facilitates services running on libresense itself and are not handled by a PBR to continue working.
 	 */
 	$set_dfltgwname = '';
 
@@ -1132,7 +1132,7 @@ function fixup_default_gateway($ipprotocol, $gateways_status, $gateways_arr) {
 		$gwdefault = config_get_path('gateways/defaultgw6', "");
 	}
 	/* do not delete dynamic (frr/bgp/ospf) route
-	 * see https://redmine.pfsense.org/issues/12536 */
+	 * see https://redmine.libresense.org/issues/12536 */
 	if ($gwdefault == "-") {
 		if (!is_dynamic_route('default', $ipprotocol)) {
 			route_del('default', $ipprotocol);
@@ -1378,7 +1378,7 @@ function get_gwgroup_members_inner($group, $gateways_status, $gateways_arr, $vip
 						$groupmember['int'] = $int;
 						$groupmember['gwip'] = $gatewayip;
 						/* set correct linklocal gateway address,
-						 * see https://redmine.pfsense.org/issues/12721 */
+						 * see https://redmine.libresense.org/issues/12721 */
 						if (is_ipaddrv6($gatewayip) && is_linklocal($gatewayip) && empty(get_ll_scope($gatewayip))) {
 							$groupmember['gwip'] .= '%' . $int;
 						}
@@ -1666,7 +1666,7 @@ function validate_address_family($ipaddr, $gwname, $disabled = false) {
 
 	/* Check gateways including disabled gateways and gateways for disabled
 	 * interfaces.
-	 * https://redmine.pfsense.org/issues/8846
+	 * https://redmine.libresense.org/issues/8846
 	 */
 	$gw_array = return_gateways_array(true, false, true);
 	if (is_array($gw_array[$gwname])) {
@@ -2212,7 +2212,7 @@ function save_gateway($gateway_settings, $realid = "", $json = false) {
 	}
 
 	/* reload IPsec and OpenVPN on gateway IP, 'Mark Gateway as Down', or 'Disabled' option change
-	 * see https://redmine.pfsense.org/issues/13076 */
+	 * see https://redmine.libresense.org/issues/13076 */
 	if (!empty($a_gateway_item[$realid]) &&
 	    (isset($gateway['disabled']) ^ isset($a_gateway_item[$realid]['disabled'])) ||
 	    (!isset($a_gateway_item[$realid]['disabled']) &&

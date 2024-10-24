@@ -2,10 +2,10 @@
 /*
  * dyndns.class
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
  */
 
 	/*
-	 * PHP.updateDNS (pfSense version)
+	 * PHP.updateDNS (libresense version)
 	 *
 	 * +====================================================+
 	 *  Services Supported:
@@ -156,7 +156,7 @@
 	 * @version 	0.8
 	 * @updated	13 October 05 at 21:02:42 GMT
 	 *
-	 * DNSexit/OpenDNS support and multiwan extension for pfSense by Ermal Luçi and Koen Zomers
+	 * DNSexit/OpenDNS support and multiwan extension for libresense by Ermal Luçi and Koen Zomers
 	 * Custom DNS support by Matt Corallo
 	 *
 	 */
@@ -559,7 +559,7 @@
 						}
 						if ($this->_curlSslVerifypeer) {
 							/* required for a local CA
-							 * see https://redmine.pfsense.org/issues/12589 */
+							 * see https://redmine.libresense.org/issues/12589 */
 							curl_setopt($ch, CURLOPT_CAPATH, "/etc/ssl/certs/");
 							curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
 						} else {
@@ -1382,8 +1382,8 @@
 					break;
 				case 'onecom':
 				case 'onecom-v6':
-					/* see https://redmine.pfsense.org/issues/11293
-					 * and https://redmine.pfsense.org/issues/12352 */
+					/* see https://redmine.libresense.org/issues/11293
+					 * and https://redmine.libresense.org/issues/12352 */
 
 					curl_setopt($ch, CURLOPT_URL, "https://www.one.com/admin/");
 					curl_setopt($ch, CURLOPT_HEADER, 1); //return the full headers to extract the cookies
@@ -1479,7 +1479,7 @@
 					$post_data['value'] = $this->_dnsIP;
 					$post_data['record'] = $this->_dnsHost;
 					$post_data['type'] = $isv6 ? 'AAAA' : 'A';
-					$post_data['comment'] = "Updated by pfSense:$this->_dnsUser on " . date('c');
+					$post_data['comment'] = "Updated by libresense:$this->_dnsUser on " . date('c');
 					$port = "";
 					if ($this->_dnsServer) {
 						$server = $this->_dnsServer;
@@ -1505,7 +1505,7 @@
 					}
 
 					// DO's API lists 20 NS records per page, so additional pages needs to be downloaded
-					// https://redmine.pfsense.org/issues/10952
+					// https://redmine.libresense.org/issues/10952
 					$_domain_records = $output->domain_records;
 					$_count = count($_domain_records);
 					$_total = 0;
@@ -1546,7 +1546,7 @@
 
 					foreach($_domain_records as $dnsRecord) {
 						// NS records are named @ in DO's API, so check type as well
-						// https://redmine.pfsense.org/issues/9171
+						// https://redmine.libresense.org/issues/9171
 						if ($this->_dnsHost == $dnsRecord->name && $dnsRecord->type == ($isv6 ? 'AAAA' : 'A')) {
 							$recordID = $dnsRecord->id;
 							break;
@@ -2736,7 +2736,7 @@
 				case 'digitalocean':
 				case 'digitalocean-v6':
 					// Creating new records returns an HTTP 201, updating existing records get 200
-					// https://redmine.pfsense.org/issues/9171
+					// https://redmine.libresense.org/issues/9171
 					if (preg_match("/HTTP\/2\s20[0,1]/i", $header)) {
 						$status = $status_intro . $success_str . gettext("IP Address Updated Successfully!");
 						$successful_update = true;
@@ -3145,8 +3145,8 @@
 		/*
 		 * Private Function (added 12 July 05) [beta]
 		 *   - Detect whether or not IP needs to be updated.
-		 *      | Written Specifically for pfSense (https://www.pfsense.org) may
-		 *      | work with other systems. pfSense base is FreeBSD.
+		 *      | Written Specifically for libresense (https://www.libresense.org) may
+		 *      | work with other systems. libresense base is FreeBSD.
 		 */
 		function _detectChange() {
 			if ($this->_dnsVerboseLog) {

@@ -2,9 +2,9 @@
 /*
  * functions.inc.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2013-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2013-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ if (Connection_Aborted()) {
 }
 
 require_once("config.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 function get_stats($sitems = array()) {
 	$sitems = is_array($sitems) ? $sitems : [];
@@ -101,7 +101,7 @@ function get_pfstate($percent=false) {
 	if (isset($config['system']['maximumstates']) and $config['system']['maximumstates'] > 0) {
 		$maxstates="{$config['system']['maximumstates']}";
 	} else {
-		$maxstates=pfsense_default_state_size();
+		$maxstates=libresense_default_state_size();
 	}
 	$curentries = `/sbin/pfctl -si |grep current`;
 	if (preg_match("/([0-9]+)/", $curentries, $matches)) {

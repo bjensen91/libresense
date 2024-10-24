@@ -17,8 +17,8 @@
 ./etc/hosts
 ./etc/master.passwd
 ./etc/passwd
-./etc/pfSense-rc
-./etc/pfSense-rc.shutdown
+./etc/libresense-rc
+./etc/libresense-rc.shutdown
 ./etc/platform
 ./etc/pwd.db
 ./etc/rc.conf

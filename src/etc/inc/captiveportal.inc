@@ -2,10 +2,10 @@
 /*
  * captiveportal.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2021 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2021 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -182,7 +182,7 @@ EOD;
 		<input type="submit" name="accept" class="login login-submit" value="Login" id="login" {$disabled}>
 	  </form>
 	  <br  />
-	  <span> <i>Made with &hearts; by</i> <strong>Netgate</strong></span>
+	  <span> <i>Made with &hearts; by</i> <strong>OpenSourceCompany</strong></span>
 	</div>
 	<div id="terms">
 		<textarea readonly>{$termsconditions}</textarea>
@@ -207,7 +207,7 @@ function captiveportal_configure() {
 			}
 		}
 		if (!$keep_online_users) {
-			/* see https://redmine.pfsense.org/issues/12455 */
+			/* see https://redmine.libresense.org/issues/12455 */
 			unlink_if_exists("{$g['vardb_path']}/captiveportal_online_users");
 		}
 		foreach ($config['captiveportal'] as $cpkey => $cp) {
@@ -390,7 +390,7 @@ EOD;
 					echo "done\n";
 				}
 			} else {
-				/* reset database on unclean shutdown, see https://redmine.pfsense.org/issues/12355 */
+				/* reset database on unclean shutdown, see https://redmine.libresense.org/issues/12355 */
 				unlink_if_exists("{$g['vardb_path']}/captiveportal{$cpzone}.db");
 			}
 		}
@@ -703,7 +703,7 @@ function captiveportal_prune_old() {
 						$rastart_time, // start time
 						$rastop_time, // Stop Time
 						10); // NAS Request
-					/* XXX rewrite to C wrapper pfSense_pf_anchor_zerocnt() */
+					/* XXX rewrite to C wrapper libresense_pf_anchor_zerocnt() */
 					captiveportal_anchor_zerocnt($cpentry[2], 'auth');
 					if ($cpcfg['reauthenticateacct'] == "stopstartfreeradius") {
 						/* Need to pause here or the FreeRADIUS server gets confused about packet ordering. */
@@ -884,14 +884,14 @@ function captiveportal_disconnect($dbent, $term_cause = 1, $stop_time = null, $c
 			captiveportal_ether_delete_entry($host, 'auth');
 		}
 		/* XXX: Redundant?! Ensure all pf(4) states are killed. */
-		$_gb = @pfSense_kill_states($dbent[2]);
-		$_gb = @pfSense_kill_srcstates($dbent[2]);
+		$_gb = @libresense_kill_states($dbent[2]);
+		$_gb = @libresense_kill_srcstates($dbent[2]);
 	}
 
 	// XMLRPC Call over to the backup node if necessary
 	if (captiveportal_xmlrpc_sync_get_details($syncip, $syncport,
 	    $syncuser, $syncpass, $carp_loop)) {
-		$rpc_client = new pfsense_xmlrpc_client();
+		$rpc_client = new libresense_xmlrpc_client();
 		$rpc_client->setConnectionData($syncip, $syncport, $syncuser, $syncpass);
 		$rpc_client->set_noticefile("CaptivePortalUserSync");
 		$arguments = array(
@@ -934,7 +934,7 @@ function captiveportal_disconnect_all($term_cause = 6, $logoutReason = "DISCONNE
 	global $g, $config, $cpzone, $cpzoneid;
 
 	if (captiveportal_xmlrpc_sync_get_details($syncip, $syncport, $syncuser, $syncpass, $carp_loop)) {
-		$rpc_client = new pfsense_xmlrpc_client();
+		$rpc_client = new libresense_xmlrpc_client();
 		$rpc_client->setConnectionData($syncip, $syncport, $syncuser, $syncpass);
 		$rpc_client->set_noticefile("CaptivePortalUserSync");
 		$arguments = array(
@@ -1027,7 +1027,7 @@ function captiveportal_passthrumac_delete_entry($macent) {
 		return;
 	}
 
-	pfSense_pf_cp_flush("{$cpzoneprefix}_passthrumac/{$host}", "ether");
+	libresense_pf_cp_flush("{$cpzoneprefix}_passthrumac/{$host}", "ether");
 }
 
 function captiveportal_passthrumac_configure($startindex = 0, $stopindex = 0) {
@@ -1084,12 +1084,12 @@ function captiveportal_ether_delete_entry($hostent, $anchor = 'allowedhosts') {
 		$host = $hostent['ip'] . '_32';
 	}
 
-	$pipes = pfSense_pf_cp_get_eth_pipes("{$cpzoneprefix}_{$anchor}/{$host}");
+	$pipes = libresense_pf_cp_get_eth_pipes("{$cpzoneprefix}_{$anchor}/{$host}");
 	if (!empty($pipes)) {
 		captiveportal_pipes_delete($pipes);
 	}
 	/* flush anchor rules */
-	pfSense_pf_cp_flush("{$cpzoneprefix}_{$anchor}/{$host}", "ether");
+	libresense_pf_cp_flush("{$cpzoneprefix}_{$anchor}/{$host}", "ether");
 }
 
 function captiveportal_allowedhostname_configure() {
@@ -1154,7 +1154,7 @@ function captiveportal_get_last_activity($ip) {
 	$cpzoneprefix = CPPREFIX . $config['captiveportal'][$cpzone]['zoneid'];
 	$anchor = $cpzoneprefix . '_auth';
 
-	$active_times = pfSense_pf_cp_get_eth_last_active("{$anchor}/{$ip}_32");
+	$active_times = libresense_pf_cp_get_eth_last_active("{$anchor}/{$ip}_32");
 	$time = 0;
 	if (!empty($active_times)) {
 		foreach ($active_times as $active_time) {
@@ -1215,7 +1215,7 @@ function captiveportal_authenticate_user(&$login = '', &$password = '', $clientm
 		a server failed auth (unable to contact server)
 
 		- When multiple user failed auth are encountered, messages returned by remote servers
-		(eg. reply in RADIUS Access-Reject) are more important than pfSense error messages.
+		(eg. reply in RADIUS Access-Reject) are more important than libresense error messages.
 
 	The $authlevel variable is a flag indicating the status of authentication
 	0 = failed server auth
@@ -1457,7 +1457,7 @@ function captiveportal_remove_entries($remove, $carp_loop = false) {
 	captiveportal_write_db($query);
 
 	if (captiveportal_xmlrpc_sync_get_details($syncip, $syncport, $syncuser, $syncpass, $carp_loop)) {
-		$rpc_client = new pfsense_xmlrpc_client();
+		$rpc_client = new libresense_xmlrpc_client();
 		$rpc_client->setConnectionData($syncip, $syncport, $syncuser, $syncpass);
 		$rpc_client->set_noticefile("CaptivePortalUserSync");
 		$rpc_client->xmlrpc_method('captive_portal_sync',
@@ -1657,7 +1657,7 @@ function captiveportal_get_dn_passthru_pipes($mac, $anchor = 'passthrumac') {
 	}
 
 	$host = str_replace(":", "", $mac);
-	$pipes = pfSense_pf_cp_get_eth_pipes("{$cpzoneprefix}_{$anchor}/$host");
+	$pipes = libresense_pf_cp_get_eth_pipes("{$cpzoneprefix}_{$anchor}/$host");
 
 	return $pipes;
 }
@@ -1687,7 +1687,7 @@ function getVolume($ip) {
 	$anchor = $cpzoneprefix . '_auth';
 
 	// It is presumed that a list of arrays is returned, each containing rule direction, and packet and bytes counters.
-	$result = pfSense_pf_cp_get_eth_rule_counters("{$anchor}/{$ip}_32");
+	$result = libresense_pf_cp_get_eth_rule_counters("{$anchor}/{$ip}_32");
 	if (!empty($result) && is_array($result)) {
 		$input_pkts = 0;
 		$input_bytes = 0;
@@ -2157,7 +2157,7 @@ function portal_allow($clientip, $clientmac, $username, $password = null, $redir
 			if (captiveportal_xmlrpc_sync_get_details($syncip, $syncport, $syncuser, $syncpass, isset($existing_sessionid))) {
 				// $existing_sessionid prevent carp loop : only forward
 				// the connection to the other node if we generated the sessionid by ourselves
-				$rpc_client = new pfsense_xmlrpc_client();
+				$rpc_client = new libresense_xmlrpc_client();
 				$rpc_client->setConnectionData($syncip, $syncport, $syncuser, $syncpass);
 				$rpc_client->set_noticefile("CaptivePortalUserSync");
 				$arguments = array(
@@ -2313,7 +2313,7 @@ function xmlrpc_sync_usedmacs($usedmacs) {
 	// XMLRPC Call over to the other node
 	if (captiveportal_xmlrpc_sync_get_details($syncip, $syncport,
 	    $syncuser, $syncpass, $carp_loop)) {
-		$rpc_client = new pfsense_xmlrpc_client();
+		$rpc_client = new libresense_xmlrpc_client();
 		$rpc_client->setConnectionData($syncip, $syncport, $syncuser, $syncpass);
 		$rpc_client->set_noticefile("CaptivePortalUsedmacsSync");
 		$arguments = array(
@@ -2548,8 +2548,8 @@ function captiveportal_allowedhostname_cleanup() {
 
 	init_config_arr(array('captiveportal', $cpzone, 'allowedhostname'));
 	foreach ($config['captiveportal'][$cpzone]['allowedhostname'] as $id => $hostnameent) {
-		$pipes = pfSense_pf_cp_get_eth_pipes("{$cpzoneprefix}_allowedhosts/hostname_{$id}");
-		pfSense_pf_cp_flush("{$cpzoneprefix}_allowedhosts/hostname_{$id}", "ether");
+		$pipes = libresense_pf_cp_get_eth_pipes("{$cpzoneprefix}_allowedhosts/hostname_{$id}");
+		libresense_pf_cp_flush("{$cpzoneprefix}_allowedhosts/hostname_{$id}", "ether");
 		if (!empty($pipes)) {
 			captiveportal_pipes_delete($pipes);
 		}
@@ -2917,7 +2917,7 @@ function captiveportal_anchor_zerocnt($ip, $anchor = 'auth') {
 	global $config, $cpzone;
 	$cpzoneprefix = CPPREFIX . $config['captiveportal'][$cpzone]['zoneid'];
 
-	pfSense_pf_cp_zerocnt("{$cpzoneprefix}_{$anchor}/{$ip}_32");
+	libresense_pf_cp_zerocnt("{$cpzoneprefix}_{$anchor}/{$ip}_32");
 }
 
 ?>

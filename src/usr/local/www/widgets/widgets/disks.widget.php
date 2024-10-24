@@ -2,8 +2,8 @@
 /*
  * disks.widget.php
  *
- * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2021-2023 Rubicon Communications, LLC (Netgate)
+ * part of libresense (https://www.libresense.org)
+ * Copyright (c) 2021-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
 // Composer autoloader
 require_once('vendor/autoload.php');
 
-// pfSense includes
+// libresense includes
 require_once('guiconfig.inc');
 
 // Widget includes

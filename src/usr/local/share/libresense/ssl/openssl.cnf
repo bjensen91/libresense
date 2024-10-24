@@ -9,7 +9,7 @@
 HOME			= .
 RANDFILE		= $ENV::HOME/.rnd
 
-# pfSense: default SAN value if $ENV::SAN is not defined
+# libresense: default SAN value if $ENV::SAN is not defined
 #
 SAN			=
 

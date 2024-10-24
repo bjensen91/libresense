@@ -2,10 +2,10 @@
 /*
  * system_authservers.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * Copyright (c) 2008 Shrew Soft Inc
  * All rights reserved.
  *
@@ -32,7 +32,7 @@
 
 require_once("guiconfig.inc");
 require_once("auth.inc");
-require_once("pfsense-utils.inc");
+require_once("libresense-utils.inc");
 
 // Have we been called to populate the "Select a container" modal?
 if ($_REQUEST['ajax']) {
@@ -120,7 +120,7 @@ if ($act == 'dup') {
 if ($_POST['act'] == "del") {
 
 	if (!$a_server[$_POST['id']]) {
-		pfSenseHeader("system_authservers.php");
+		libresenseHeader("system_authservers.php");
 		exit;
 	}
 
@@ -427,7 +427,7 @@ if ($_POST['save']) {
 
 		write_config("Authentication Servers settings saved");
 
-		pfSenseHeader("system_authservers.php");
+		libresenseHeader("system_authservers.php");
 	}
 }
 

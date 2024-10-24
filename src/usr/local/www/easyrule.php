@@ -2,11 +2,11 @@
 /*
  * easyrule.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
- * Originally Sponsored By Anathematic @ pfSense Forums
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
+ * Originally Sponsored By Anathematic @ libresense Forums
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

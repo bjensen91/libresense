@@ -2,10 +2,10 @@
 /*
  * firewall_aliases.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -114,7 +114,7 @@ display_top_tabs($tab_array);
 <?php
 	/* Ensure aliases are presented in natural sort order so they are easier to locate.
 	 * and preserve keys so that the IDs match in the config and the list.
-	 * https://redmine.pfsense.org/issues/14015 */
+	 * https://redmine.libresense.org/issues/14015 */
 	$aliases = get_sorted_aliases();
 
 	foreach ($aliases as $i => $alias):

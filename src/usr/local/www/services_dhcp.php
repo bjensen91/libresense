@@ -2,10 +2,10 @@
 /*
  * services_dhcp.php
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -847,7 +847,7 @@ if (isset($_POST['apply'])) {
 	if (!function_exists('is_package_installed')) {
 		require_once('pkg-utils.inc');
 	}
-	if (is_package_installed('pfSense-pkg-bind') &&
+	if (is_package_installed('libresense-pkg-bind') &&
 	    config_path_enabled('installedpackages/bind/config/0', 'enable_bind') &&
 	    dhcp_is_backend('isc')) {
 		$reloadbind = false;

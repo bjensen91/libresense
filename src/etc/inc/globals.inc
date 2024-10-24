@@ -2,10 +2,10 @@
 /*
  * globals.inc
  *
- * part of pfSense (https://www.pfsense.org)
+ * part of libresense (https://www.libresense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2023 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2023 Rubicon Communications, LLC (OpenSourceCompany)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,7 +54,7 @@ $g = [
 	'acbbackuppath' => '/cf/conf/acb/',
 	'event_address' => 'unix:///var/run/check_reload_status',
 	'factory_shipped_username' => 'admin',
-	'factory_shipped_password' => 'pfsense',
+	'factory_shipped_password' => 'libresense',
 	'upload_path' => '/root',
 	'dhcpd_chroot_path' => '/var/dhcpd',
 	'unbound_chroot_path' => '/var/unbound',
@@ -71,11 +71,11 @@ $g = [
 	'cf_path' => '/cf',
 	'cf_conf_path' => '/cf/conf',
 	'www_path' => '/usr/local/www',
-	'xml_rootobj' => 'pfsense',
+	'xml_rootobj' => 'libresense',
 	'admin_group' => 'admins',
 	'product_name' => 'libresense',
-	'product_label' => 'pfSense',
-	'product_label_html' => 'Netgate pfSense<sup>&#174;</sup>',
+	'product_label' => 'libresense',
+	'product_label_html' => 'OpenSourceCompany libresense<sup>&#174;</sup>',
 	'product_version' => $product_version,
 	'product_copyright_years' => '2004 - ' . $present_year,
 	'disablehelpmenu' => false,
@@ -197,7 +197,7 @@ if (($machine_type == 'arm') || ($machine_type == 'arm64')) {
 /* Read all XML files in following dir and load menu entries */
 $g['ext_menu_path'] = '/usr/local/share/'. g_get('product_name') . '/menu';
 
-/* Cache file used to store pfSense version */
+/* Cache file used to store libresense version */
 $g['version_cache_file'] = g_get('varrun_path') . '/' . g_get('product_name') . '_version';
 $g['version_cache_refresh'] = 7200; /* 2h */
 
@@ -569,7 +569,7 @@ function get_ipprotocols(?string $type = ''):array {
 	return array_diff($ipprotocols, $exclude);
 }
 
-// source pfSense Plus specific globals last
+// source libresense Plus specific globals last
 if (can_include('globals.plus.inc')) {
 	include_once('globals.plus.inc');
 }
