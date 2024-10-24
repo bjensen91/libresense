@@ -285,20 +285,20 @@ make_world() {
 #	(script -aq $LOGFILE make -C ${FREEBSD_SRC_DIR}/tools/tools/ath/athstats ${makeargs} clean all install || print_error_pfS;) | egrep '^>>>' | tee -a ${LOGFILE}
 	echo ">>> Building and installing crypto tools and athstats for ${TARGET} architecture... (Finished - $(LC_ALL=C date))" | tee -a ${LOGFILE}
 
-	if [ "${PRODUCT_NAME}" = "libresense" -a -n "${GNID_REPO_BASE}" ]; then
-		echo ">>> Building gnid... " | tee -a ${LOGFILE}
+	if [ "${PRODUCT_NAME}" = "pfsense" -a -n "${_REPO_BASE}" ]; then
+		echo ">>> Building ... " | tee -a ${LOGFILE}
 		(\
-			cd ${GNID_SRC_DIR} && \
+			cd ${_SRC_DIR} && \
 			make \
 				CC=${BUILD_CC} \
-				INCLUDE_DIR=${GNID_INCLUDE_DIR} \
-				LIBCRYPTO_DIR=${GNID_LIBCRYPTO_DIR} \
-			clean gnid \
+				INCLUDE_DIR=${_INCLUDE_DIR} \
+				LIBCRYPTO_DIR=${_LIBCRYPTO_DIR} \
+			clean  \
 		) || print_error_pfS
-		install -o root -g wheel -m 0700 ${GNID_SRC_DIR}/gnid \
+		install -o root -g wheel -m 0700 ${_SRC_DIR}/ \
 			${STAGE_CHROOT_DIR}/usr/sbin \
 			|| print_error_pfS
-		install -o root -g wheel -m 0700 ${GNID_SRC_DIR}/gnid \
+		install -o root -g wheel -m 0700 ${_SRC_DIR}/ \
 			${INSTALLER_CHROOT_DIR}/usr/sbin \
 			|| print_error_pfS
 	fi
@@ -1127,7 +1127,7 @@ update_freebsd_sources() {
 		echo "Done!"
 	fi
 
-	if [ "${PRODUCT_NAME}" = "libresense" -a -n "${GNID_REPO_BASE}" ]; then
+	if [ "${PRODUCT_NAME}" = "pfsense" -a -n "${GNID_REPO_BASE}" ]; then
 		echo ">>> Obtaining gnid sources..."
 		${BUILDER_SCRIPTS}/git_checkout.sh \
 			-r ${GNID_REPO_BASE} \
